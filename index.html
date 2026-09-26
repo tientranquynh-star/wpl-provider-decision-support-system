@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>WPL Transportation Provider Decision-Support System V3.9</title>
+<style>
+:root{
+  --bg:#f5f3ee;--paper:#fff;--ink:#17243d;--blue:#2f5f9e;--blue2:#e9eff8;--orange:#c65d20;
+  --green:#21704c;--greenbg:#e6f3eb;--red:#a93b31;--redbg:#fae9e6;--amber:#8d6a10;--amberbg:#fff6dc;
+  --muted:#697386;--rule:#d9d5ca;--soft:#ece9e2;--nav:#13233e;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:Inter,Segoe UI,Arial,sans-serif;
+}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45}
+button,input,select{font:inherit} button{cursor:pointer}
+.app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+.side{background:var(--nav);color:#fff;padding:22px 16px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{font-weight:800;font-size:18px;letter-spacing:.02em;line-height:1.25;margin-bottom:5px}.sub{font-size:11px;color:#aebbd0;font-family:var(--mono);margin-bottom:22px}
+.navbtn{display:block;width:100%;text-align:left;border:0;background:transparent;color:#c5d0e1;padding:10px 11px;border-radius:5px;margin:3px 0;font-weight:600}.navbtn.active,.navbtn:hover{background:#213657;color:#fff}.navbtn .n{display:inline-block;width:24px;color:#7fa1d2;font-family:var(--mono);font-size:11px}
+.sidefoot{margin-top:22px;padding-top:14px;border-top:1px solid #2c4264;font-size:11px;color:#9eacc1}.main{padding:24px 28px 70px;min-width:0}.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;border-bottom:2px solid var(--ink);padding-bottom:13px;margin-bottom:20px}.title h1{margin:0;font-size:22px;text-transform:uppercase;letter-spacing:-.01em}.title p{margin:5px 0 0;color:var(--muted)}.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.lang{display:flex;border:1px solid var(--ink)}.lang button{border:0;background:#fff;padding:6px 10px;font-family:var(--mono);font-size:11px}.lang button.on{background:var(--ink);color:#fff}
+.view{display:none}.view.active{display:block}.grid{display:grid;gap:15px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}@media(max-width:1050px){.app{grid-template-columns:1fr}.side{position:relative;height:auto}.g2,.g3,.g4{grid-template-columns:1fr}}
+.card{background:var(--paper);border:1px solid var(--rule);border-radius:5px;padding:16px}.card h2,.card h3{margin:0 0 8px}.card h2{font-size:18px}.card h3{font-size:14px}.muted{color:var(--muted)}.small{font-size:12px}.mono{font-family:var(--mono)}
+.kpi{padding:14px 15px;border-left:4px solid var(--blue)}.kpi .val{font-size:28px;font-weight:800;margin-top:4px}.kpi .lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)}
+.badge{display:inline-block;padding:3px 7px;border-radius:3px;font-size:10px;font-weight:700;letter-spacing:.06em;font-family:var(--mono)}.bblue{background:var(--blue2);color:var(--blue)}.bgood{background:var(--greenbg);color:var(--green)}.bwarn{background:var(--amberbg);color:var(--amber)}.bbad{background:var(--redbg);color:var(--red)}
+.action{border:1px solid var(--blue);background:#fff;color:var(--blue);padding:7px 11px;border-radius:3px;font-family:var(--mono);font-size:11px}.action.primary{background:var(--blue);color:#fff}.action.orange{background:var(--orange);border-color:var(--orange);color:#fff}.action.quiet{border-color:var(--rule);color:var(--muted)}.action.danger{border-color:var(--red);color:var(--red);background:#fff}.action.danger:hover{background:var(--redbg)}.cleanupbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 12px;background:#fff;border:1px solid var(--rule);border-radius:4px;margin:10px 0}.cleanupbar .label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-family:var(--mono);margin-right:4px}.selbox{width:16px;height:16px;accent-color:var(--blue);cursor:pointer}
+.profileRow{display:grid;grid-template-columns:1fr 38px;gap:6px;align-items:stretch;margin:6px 0}.profileRow .action{margin:0!important}.profileDelete{border:1px solid var(--rule);background:#fff;color:var(--red);border-radius:3px;font-weight:800;font-size:16px;line-height:1}.profileDelete:hover{background:var(--redbg);border-color:#d9a39d}
+.sectionhead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:25px 0 10px;border-bottom:1px solid var(--rule);padding-bottom:7px}.sectionhead h2{margin:0;font-size:17px;text-transform:uppercase}.sectionhead p{margin:0;color:var(--muted);font-size:12px}
+.controls{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.field label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-family:var(--mono);margin-bottom:4px}.field select,.field input[type=text],.field input[type=number]{border:1px solid var(--rule);background:#fff;padding:8px 9px;border-radius:3px;min-width:150px}.field input[type=number]{min-width:90px}
+.tablewrap{overflow:auto;background:#fff;border:1px solid var(--rule);border-radius:4px}table{border-collapse:collapse;width:100%;min-width:920px}th{background:var(--ink);color:#fff;font-size:11px;font-weight:600;padding:8px 7px;white-space:nowrap}td{border-bottom:1px solid var(--soft);padding:7px 7px;text-align:center;white-space:nowrap}td:first-child,th:first-child{text-align:left}tr:nth-child(even) td{background:#fbfaf7}td input{border:0;background:transparent;width:78px;text-align:center;font-family:var(--mono);color:var(--ink)}td input.name{width:160px;text-align:left;font-family:var(--sans);font-weight:600}.badcell{background:var(--redbg)!important;color:var(--red)}
+.hint{background:var(--amberbg);border:1px dashed #dfc566;border-left:4px solid #dfc566;padding:10px 12px;border-radius:3px;color:#76590d;margin:10px 0;font-size:12px}.okbox{background:var(--greenbg);border-left:4px solid var(--green);padding:10px 12px;color:#215a43}.warnbox{background:var(--redbg);border-left:4px solid var(--red);padding:10px 12px;color:var(--red)}
+.sliderrow{display:grid;grid-template-columns:26px 1fr 180px 64px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--soft)}.sliderrow input[type=range]{width:100%;accent-color:var(--blue)}.sliderrow .pct{text-align:right;font-family:var(--mono);font-weight:700}.slab{font-weight:600}.slab small{display:block;color:var(--muted);font-weight:400}.total{display:flex;justify-content:space-between;background:var(--greenbg);border:1px solid #8bbba2;padding:8px 10px;margin-top:10px;color:var(--green);font-family:var(--mono);font-size:11px}
+.rankrow{display:grid;grid-template-columns:48px 1fr 220px 92px;gap:12px;align-items:center;background:#fff;border:1px solid var(--rule);border-radius:4px;padding:10px 13px;margin:7px 0}.rankrow.top{border-left:5px solid var(--blue)}.rankrow.low{border-left:5px solid var(--red)}.rankpos{font-size:24px;font-weight:800;text-align:center}.rankname{font-size:15px;font-weight:700}.bar{height:10px;background:var(--soft)}.bar i{display:block;height:100%;background:var(--blue)}.score{text-align:right;font-family:var(--mono);font-size:17px;font-weight:700}
+.flow{display:grid;grid-template-columns:1fr 46px 1.25fr 46px 1fr;align-items:stretch}.flow .box{border:1px solid var(--rule);background:#fff;padding:15px}.flow .box.dark{background:var(--ink);color:#fff}.flow .arrow{display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--muted)}@media(max-width:900px){.flow{grid-template-columns:1fr}.flow .arrow{display:none}}
+.arch{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}.arch .node{padding:12px;border:1px solid var(--rule);background:#fff;text-align:center}.arch .node b{display:block;font-size:12px}.arch .node span{font-size:10px;color:var(--muted)}@media(max-width:1000px){.arch{grid-template-columns:1fr 1fr}}
+.policy{border-left:5px solid var(--blue)}.policy.good{border-color:var(--green)}.policy.warn{border-color:#cc9c1d}.policy.bad{border-color:var(--red)}.policy .status{font-size:22px;font-weight:800}.policy ul{margin:7px 0 0 18px}.pill{display:inline-block;padding:4px 8px;border:1px solid var(--rule);border-radius:20px;font-size:11px;margin:2px}
+.chartbox{background:#fff;border:1px solid var(--rule);padding:12px;border-radius:4px;overflow:auto}.chartbox svg{width:100%;min-width:560px;height:280px}.legendline{display:flex;gap:18px;font-size:11px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
+.charttitle{font-size:13px;font-weight:800;margin:0 0 6px}.trendcard{position:relative;overflow:hidden}.trendcard .big{font-size:22px;font-weight:800;margin:5px 0}.trendcard .mini{font-size:11px;color:var(--muted)}.delta-up{color:var(--green);font-weight:700}.delta-down{color:var(--red);font-weight:700}.delta-flat{color:var(--muted);font-weight:700}.trendNarrative{border-left:5px solid var(--blue);margin-top:12px}.trendNarrative.good{border-color:var(--green);background:var(--greenbg)}.trendNarrative.bad{border-color:var(--red);background:var(--redbg)}.trendNarrative.warn{border-color:#cc9c1d;background:var(--amberbg)}
+.footer{margin-top:35px;border-top:1px solid var(--rule);padding-top:12px;font-size:11px;color:var(--muted)}
+
+.workflow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0 18px}.stepcard{appearance:none;text-align:left;background:#fff;border:1px solid var(--rule);border-top:4px solid var(--blue);border-radius:5px;padding:16px;color:var(--ink);min-height:132px;transition:.15s}.stepcard:hover{transform:translateY(-1px);border-color:#9cb2d0}.stepcard .stepno{font-family:var(--mono);font-size:11px;color:var(--blue);letter-spacing:.08em}.stepcard h3{margin:7px 0 5px;font-size:15px}.stepcard p{margin:0;color:var(--muted);font-size:12px}.startcard{background:#fff;border:1px solid var(--rule);border-left:5px solid var(--blue);padding:17px 18px;border-radius:5px}.startcard h2{margin:4px 0 6px}.advanced{margin-top:14px;background:#fff;border:1px solid var(--rule);border-radius:5px}.advanced>summary{cursor:pointer;padding:12px 14px;font-weight:700;color:var(--ink);list-style:none}.advanced>summary::-webkit-details-marker{display:none}.advanced>summary:after{content:'+';float:right;font-family:var(--mono);color:var(--blue)}.advanced[open]>summary:after{content:'−'}.advancedBody{padding:0 14px 14px}.managementGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.toolgroup{border:1px solid var(--soft);border-radius:4px;padding:13px}.toolgroup h3{margin:0 0 5px}.toolgroup p{margin:0 0 10px;color:var(--muted);font-size:12px}.toolgroup .action{margin:3px 4px 3px 0}.stepstrip{background:#fff;border:1px solid var(--rule);border-radius:5px;padding:14px;margin-bottom:12px}.stepstrip .stephead{font-weight:800;margin-bottom:9px}.stepstrip .stephead span{font-family:var(--mono);font-size:10px;color:var(--blue);margin-right:8px}.selectionbar{display:none;gap:10px;align-items:center;flex-wrap:wrap;padding:9px 11px;background:var(--blue2);border:1px solid #b8c9e1;border-radius:4px;margin:10px 0}.simplehint{background:#f8fafc;border-left:4px solid var(--blue);padding:10px 12px;margin:10px 0;color:#42516a;font-size:12px}.methodnote{font-size:12px;color:var(--muted);margin-top:8px}.contextcard .bigline{font-size:17px;font-weight:800;margin:5px 0}.dangerzone{border-color:#e0b5b1;background:#fffafa}.dangerzone h3{color:var(--red)}
+@media(max-width:1050px){.workflow{grid-template-columns:1fr 1fr}.managementGrid{grid-template-columns:1fr}}@media(max-width:650px){.workflow{grid-template-columns:1fr}}
+
+
+.historytabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.historytab{border:1px solid #d8d4cc;background:#fff;color:#24324a;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer}
+.historytab.active{background:#17243d;color:#fff;border-color:#17243d}
+.historypanel{display:none}
+.historypanel.active{display:block}
+.topsummary{margin:12px 0}
+.rankpill{display:inline-block;min-width:46px;text-align:center;padding:4px 8px;border-radius:999px;background:#eef3f9;font-weight:800}
+
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <div class="brand" data-i18n="brand">WPL Provider Decision-Support System</div>
+  <div class="sub" data-i18n="brand_sub">V3.9 · AHP–TOPSIS · ranking & monitoring prototype</div>
+  <button class="navbtn active" data-view="dashboard"><span class="n">01</span><span data-i18n="nav_dash">Dashboard</span></button>
+  <button class="navbtn" data-view="data"><span class="n">02</span><span data-i18n="nav_data">Provider Data</span></button>
+  <button class="navbtn" data-view="priority"><span class="n">03</span><span data-i18n="nav_prio">Decision Priorities</span></button>
+  <button class="navbtn" data-view="ranking"><span class="n">04</span><span data-i18n="nav_rank">Recommendation</span></button>
+  <button class="navbtn" data-view="history"><span class="n">05</span><span data-i18n="nav_hist">Performance History</span></button>
+  <div class="sidefoot" data-i18n="sidefoot">Prototype scope: decision support. Final supplier decisions remain with WPL management.</div>
+</aside>
+<main class="main">
+  <div class="topbar">
+    <div class="title"><h1 id="pageTitle">Dashboard</h1><p id="pageSub" data-i18n="page_sub_dashboard">Current evaluation, data coverage and system status</p></div>
+    <div class="tools">
+      <div class="field"><label data-i18n="period">Period</label><select id="globalPeriod"></select></div>
+      <div class="field"><label data-i18n="profile">Priority profile</label><select id="globalProfile"></select></div>
+      <div class="lang"><button id="btnEN" class="on">EN</button><button id="btnVI">VI</button></div>
+    </div>
+  </div>
+
+  
+  <section class="view active" id="view-dashboard">
+    <div class="startcard">
+      <span class="badge bblue" data-i18n="overview_badge">DECISION OVERVIEW</span>
+      <h2 data-i18n="overview_title">Current provider decision at a glance</h2>
+      <p class="muted" data-i18n="overview_text">This page summarizes the selected period, available provider data, active priority setting and current recommendation.</p>
+    </div>
+
+    <div class="g4 grid" id="dashKpis"></div>
+
+    <div class="sectionhead">
+      <h2 data-i18n="current_summary">Current decision summary</h2>
+      <p data-i18n="current_summary_sub">Use this as the management snapshot before opening detailed pages.</p>
+    </div>
+    <div class="g2 grid">
+      <div class="card" id="dashRecommend"></div>
+      <div class="card contextcard" id="dashScale"></div>
+    </div>
+
+    <div class="sectionhead">
+      <h2 data-i18n="quick_actions">Quick actions</h2>
+      <p data-i18n="quick_actions_sub">Go directly to the task you need.</p>
+    </div>
+    <div class="workflow">
+      <button class="stepcard goView" data-go="data"><div class="stepno">01</div><h3 data-i18n="qa_data">Manage provider data</h3><p data-i18n="qa_data_desc">Import, add, edit or remove provider records.</p></button>
+      <button class="stepcard goView" data-go="priority"><div class="stepno">02</div><h3 data-i18n="qa_priority">Set priorities</h3><p data-i18n="qa_priority_desc">Choose the thesis baseline or a different business scenario.</p></button>
+      <button class="stepcard goView" data-go="ranking"><div class="stepno">03</div><h3 data-i18n="qa_rank">View recommendation</h3><p data-i18n="qa_rank_desc">See the recommended and backup provider with full ranking.</p></button>
+      <button class="stepcard goView" data-go="history"><div class="stepno">04</div><h3 data-i18n="qa_history">Review performance history</h3><p data-i18n="qa_history_desc">Compare the same provider across stored periods.</p></button>
+    </div>
+
+    <details class="advanced">
+      <summary data-i18n="method_background">What happens in the background?</summary>
+      <div class="advancedBody">
+        <div class="flow">
+          <div class="box"><span class="badge bblue" data-i18n="badge_input">INPUT</span><h3 data-i18n="input_title">WPL enters</h3><div class="small" data-i18n="input_lines">• Provider list<br>• 10 performance indicators<br>• Period<br>• Customer / priority profile</div></div>
+          <div class="arrow">→</div>
+          <div class="box dark"><span class="badge" data-i18n="badge_blackbox">BLACK BOX</span><h3 data-i18n="engine_title">System calculates automatically</h3><div class="small" data-i18n="engine_flow">AHP-based weight structure → TOPSIS → scenario recalculation → historical comparison</div></div>
+          <div class="arrow">→</div>
+          <div class="box"><span class="badge bgood" data-i18n="badge_output">OUTPUT</span><h3 data-i18n="output_title">WPL receives</h3><div class="small" data-i18n="output_lines">• Ranking & recommendation<br>• Backup provider<br>• Historical trend<br>• Simple management guidance</div></div>
+        </div>
+      </div>
+    </details>
+  </section>
+
+<section class="view" id="view-data">
+    <div class="sectionhead"><h2 data-i18n="data_title">Provider data</h2><p data-i18n="data_sub">Manage provider records by period. Import in bulk or edit directly.</p></div>
+    <div class="stepstrip">
+      <div class="stephead"><span>01</span><span data-i18n="choose_period_title">Choose or create a period</span></div>
+      <div class="controls">
+        <div class="field"><label data-i18n="period">Period</label><select id="dataPeriod"></select></div>
+        <div class="field"><label data-i18n="new_period_label">New period / year</label><input id="newPeriodInput" type="text" inputmode="numeric" placeholder="2029"></div>
+        <button class="action" id="addPeriodBtn" data-i18n="add_period">+ Add period</button>
+        <button class="action danger" id="clearCurrentPeriod" data-i18n="clear_period">Clear current period</button>
+      </div>
+      <div class="methodnote" data-i18n="clear_period_note">This removes all provider rows in the selected period only. Other periods are not affected.</div>
+    </div>
+    <div class="stepstrip">
+      <div class="stephead"><span>02</span><span data-i18n="add_data_title">Add provider data</span></div>
+      <div class="controls">
+        <div class="field">
+          <label data-i18n="import_mode">Import mode</label>
+          <select id="importMode">
+            <option value="replace" data-i18n="import_replace">Replace periods in file (recommended)</option>
+            <option value="merge" data-i18n="import_merge">Merge / update existing data</option>
+          </select>
+        </div>
+        <button class="action primary" id="importBtn" data-i18n="import_csv">Import CSV file(s)</button><input id="fileInput" type="file" accept=".csv,text/csv" multiple hidden>
+        <button class="action" id="undoImport" data-i18n="undo_import">Undo last import</button>
+        <button class="action" id="downloadSample" data-i18n="download_sample">Download 4-year sample CSV</button>
+        <button class="action" id="addProvider" data-i18n="add_provider">+ Add provider manually</button>
+      </div>
+      <div class="methodnote" data-i18n="import_mode_note">Replace is safest when loading a complete dataset for a period: old rows in the imported periods are cleared first. Merge keeps existing rows and only updates matching provider names.</div>
+    </div>
+    <div class="stepstrip">
+      <div class="stephead"><span>03</span><span data-i18n="manage_rows_title">Review or remove provider rows</span></div>
+      <div class="controls" style="margin:8px 0">
+        <div class="field"><label data-i18n="search_provider">Search provider</label><input type="text" id="providerSearch" placeholder="ITL / Bee / ..."></div>
+        <span class="small muted" id="rowCount"></span>
+        <span class="small muted"><b data-i18n="selected_rows">Selected rows:</b> <span id="selectedCount">0 selected</span></span>
+        <button class="action danger" id="deleteSelected" data-i18n="delete_selected">Delete selected</button>
+      </div>
+      <div class="methodnote" data-i18n="delete_rows_note">Tick one or more rows, then choose Delete selected. The × button at the end of a row deletes one provider only.</div>
+    </div>
+    <div id="selectionBar" style="display:none"></div>
+    <div class="tablewrap"><table><thead id="dataHead"></thead><tbody id="dataBody"></tbody></table></div>
+    <div class="simplehint" data-i18n="csv_help">Bulk CSV format: Period, Provider, C11, C12, C21, C22, C31, C32, C41, C42, C51, C52.</div>
+    <details class="advanced">
+      <summary data-i18n="advanced_data_tools">Advanced data management, backup & transfer</summary>
+      <div class="advancedBody managementGrid">
+        <div class="toolgroup">
+          <h3 data-i18n="backup_transfer_title">Backup & transfer</h3>
+          <p data-i18n="backup_transfer_desc">Use these only when saving, restoring or moving the tool between computers.</p>
+          <button class="action" id="exportPeriod" data-i18n="export_period">Export current period</button>
+          <button class="action" id="saveBackup" data-i18n="backup">Save full backup</button>
+          <input id="restoreInput" type="file" accept=".json" hidden>
+          <button class="action" id="restoreBackup" data-i18n="restore">Load full backup</button>
+          <button class="action" id="exportPortable" data-i18n="export_portable">Export portable app</button>
+          <div class="methodnote" data-i18n="file_type_guide">CSV = provider data import. JSON = full-system backup. Portable HTML = open the current system state directly on another computer.</div>
+        </div>
+        <div class="toolgroup dangerzone">
+          <h3 data-i18n="recovery_cleanup_title">Recovery & cleanup</h3>
+          <p data-i18n="recovery_cleanup_desc">Use these tools after testing, after an incorrect import, or when you want to return to a clean starting point.</p>
+
+          <button class="action" id="loadBaseline" data-i18n="load_baseline">Restore 2025 thesis baseline only</button>
+          <div class="methodnote" data-i18n="load_baseline_note">Restores only the original five providers in 2025. Other periods remain unchanged.</div>
+
+          <button class="action danger" id="clearAllProviderDataBtn" data-i18n="clear_all_provider_data">Clear all provider data</button>
+          <div class="methodnote" data-i18n="clear_all_provider_data_note">Deletes provider rows from every stored period and leaves one empty 2025 period. Priority profiles are kept.</div>
+
+          <button class="action danger" id="resetSystemBtn" data-i18n="reset_system">Clear all test data & restore thesis baseline</button>
+          <div class="methodnote" data-i18n="reset_system_note">Recommended after testing: removes all imported periods, custom profiles and changes, then restores 2025 with the five original thesis providers and Expert baseline.</div>
+        </div>
+      </div>
+    </details>
+  
+    <div style="margin-top:14px">
+      <button class="action primary goView" data-go="priority" data-i18n="next_priority">Next: Set decision priorities</button>
+    </div>
+  </section>
+
+  
+  <section class="view" id="view-priority">
+    <div class="sectionhead">
+      <h2 data-i18n="prio_title">Decision priorities</h2>
+      <p data-i18n="prio_sub">Choose the business priority for this decision. The thesis baseline is the default.</p>
+    </div>
+    <div class="simplehint" data-i18n="priority_tip">For the thesis result, use Expert baseline. Use other profiles only to test how the ranking changes when priorities change.</div>
+
+    <div class="card">
+      <h3 data-i18n="profiles">Choose a priority profile</h3>
+      <div id="profileCards"></div>
+    </div>
+
+    <details class="advanced">
+      <summary data-i18n="custom_whatif">Custom what-if / customer-specific priority</summary>
+      <div class="advancedBody">
+        <div class="g2 grid">
+          <div class="card">
+            <h3 data-i18n="weights">Adjust five business priorities</h3>
+            <div id="sliders"></div>
+            <div class="total"><b><span data-i18n="total_weight">Total weight:</span> <span id="totalWeight">100.0%</span></b><span data-i18n="locked100">Always locked at 100%</span></div>
+          </div>
+          <div class="card">
+            <h3 data-i18n="save_custom_profile">Save this custom setting</h3>
+            <p class="small muted" data-i18n="save_custom_profile_note">Save only when this priority mix will be reused for a customer or shipment type.</p>
+            <div class="field">
+              <label data-i18n="save_profile_name">Profile name</label>
+              <input id="newProfileName" type="text" placeholder="Customer A / Key Account X">
+            </div>
+            <button class="action primary" id="saveProfile" style="margin-top:8px" data-i18n="save_profile">Save profile</button>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="advanced">
+      <summary data-i18n="method_details">Method details: fixed local AHP weights</summary>
+      <div class="advancedBody">
+        <p class="muted small" data-i18n="local_note">These are retained from the expert survey unless WPL conducts a new AHP assessment.</p>
+        <div class="g4 grid" id="localWeightCards"></div>
+      </div>
+    </details>
+
+    <div style="margin-top:14px">
+      <button class="action primary goView" data-go="ranking" data-i18n="next_ranking">Next: View recommendation</button>
+    </div>
+  </section>
+
+<section class="view" id="view-ranking">
+    <div class="sectionhead"><h2 data-i18n="rank_title">Provider recommendation & ranking</h2><p id="rankContext"></p></div>
+    <div id="rankWarnings"></div>
+    <div class="card" id="recommendCard" style="margin-bottom:12px"></div>
+    <div id="rankingList"></div>
+    <details class="advanced">
+      <summary data-i18n="compare_scenarios">Compare preset priority scenarios</summary>
+      <div class="advancedBody"><div id="scenarioCard"></div></div>
+    </details>
+  
+    <div style="margin-top:14px">
+      <button class="action primary goView" data-go="history" data-i18n="next_history">Next: Check performance history</button>
+    </div>
+  </section>
+
+  
+  <section class="view" id="view-history">
+    <div class="sectionhead"><h2 data-i18n="hist_title">Provider performance history</h2><p data-i18n="hist_sub">Track one provider over time or compare the leading provider group by period.</p></div>
+
+    <div class="historytabs">
+      <button class="historytab active" id="historyTabIndividual" data-history-tab="individual" data-i18n="history_tab_individual">Individual provider</button>
+      <button class="historytab" id="historyTabTop" data-history-tab="top" data-i18n="history_tab_top">Top providers</button>
+    </div>
+
+    <div class="historypanel active" id="historyIndividualPanel">
+      <div class="controls">
+      <div class="field"><label data-i18n="provider">Provider</label><select id="historyProvider"></select></div>
+      <div class="field"><label data-i18n="history_window">Tracking window</label><select id="historyWindow"></select></div>
+      <div class="controls" id="customHistoryRange" style="display:none">
+        <div class="field"><label data-i18n="from_period">From</label><select id="historyFrom"></select></div>
+        <div class="field"><label data-i18n="to_period">To</label><select id="historyTo"></select></div>
+      </div>
+      <button class="action" id="loadDemo" style="display:none" data-i18n="demo_history">Load illustrative 3-year demo</button>
+    </div>
+    <div class="simplehint" data-i18n="history_tip">Historical tracking works when the provider name is consistent across periods. The display window does not delete older data.</div>
+    <div class="g4 grid" id="historyKpis" style="margin:12px 0"></div>
+    <div class="g2 grid">
+      <div class="chartbox"><div class="charttitle" data-i18n="rank_trend_title">Relative position over time</div><svg id="rankHistoryChart" viewBox="0 0 900 280" preserveAspectRatio="none"></svg><div class="legendline"><span data-i18n="rank_label_note">Labels show rank / provider count</span></div></div>
+      <div class="chartbox"><div class="charttitle" data-i18n="score_trend_title">Decision score over time</div><svg id="scoreHistoryChart" viewBox="0 0 900 280" preserveAspectRatio="none"></svg><div class="legendline"><span data-i18n="score_note">Decision score = TOPSIS result; higher is better</span></div></div>
+    </div>
+    <div class="sectionhead"><h2 data-i18n="trend_summary_title">Trend summary</h2><p data-i18n="trend_summary_sub">First period → latest period, shown with direction of change.</p></div>
+    <div class="g4 grid" id="trendSummary"></div>
+    <div class="card trendNarrative" id="trendNarrative"></div>
+    <div class="card" id="managementGuidance" style="margin-top:12px"></div>
+    <details class="advanced">
+      <summary data-i18n="history_table">Period-by-period detail</summary>
+      <div class="advancedBody"><div class="tablewrap"><table id="historyTable"></table></div></div>
+    </details>
+    </div>
+
+    <div class="historypanel" id="historyTopPanel">
+      <div class="simplehint" data-i18n="top_history_note">This view uses the currently selected Decision Priority. It shows the strongest providers in one period and how those providers ranked in other stored periods.</div>
+
+      <div class="controls" style="margin:12px 0">
+        <div class="field">
+          <label data-i18n="top_period">Period</label>
+          <select id="topHistoryPeriod"></select>
+        </div>
+        <div class="field">
+          <label data-i18n="show_top">Show</label>
+          <select id="topHistoryN">
+            <option value="5">Top 5</option>
+            <option value="10" selected>Top 10</option>
+            <option value="20">Top 20</option>
+          </select>
+        </div>
+        <div class="field">
+          <label data-i18n="active_priority">Active priority</label>
+          <div class="badge bblue" id="topHistoryProfile" style="margin-top:4px"></div>
+        </div>
+      </div>
+
+      <div class="g4 grid topsummary" id="topHistoryKpis"></div>
+
+      <div class="sectionhead">
+        <h2 data-i18n="top_ranking_title">Top providers in selected period</h2>
+        <p data-i18n="top_ranking_sub">Decision score is the TOPSIS closeness coefficient under the active priority profile.</p>
+      </div>
+      <div class="tablewrap"><table id="topHistoryTable"></table></div>
+
+      <div class="sectionhead">
+        <h2 data-i18n="movement_title">Rank movement across periods</h2>
+        <p data-i18n="movement_sub">The rows below are the selected period's Top providers. A dash means that provider did not exist in that period.</p>
+      </div>
+      <div class="tablewrap"><table id="topMovementTable"></table></div>
+    </div>
+  </section>
+<div class="footer" data-i18n="footer_note">WPL Transportation Provider Decision-Support System V3.9 · Thesis prototype. Baseline 2025 provider data and AHP weights are derived from the thesis dataset. Additional sample-period data are illustrative and used only for interface testing unless explicitly validated by WPL.</div>
+</main>
+</div>
+<script>
+const GROUPS=[
+ {code:'A',base:.338738,en:'Operational Performance',vi:'Hiệu quả vận hành'},
+ {code:'B',base:.112239,en:'Cost & Pricing',vi:'Chi phí và giá cả'},
+ {code:'C',base:.154712,en:'Capacity & Infrastructure',vi:'Năng lực và hạ tầng'},
+ {code:'D',base:.303894,en:'Reputation & Legal Compliance',vi:'Uy tín & tuân thủ pháp lý'},
+ {code:'E',base:.090418,en:'Customer Service',vi:'Dịch vụ khách hàng'}];
+const CRIT=[
+ {id:'C11',g:0,local:.208791,cost:false,en:'On-time delivery',vi:'Giao đúng hạn',min:0,max:100},
+ {id:'C12',g:0,local:.791209,cost:false,en:'Cargo safety',vi:'An toàn hàng hóa',min:0,max:100},
+ {id:'C21',g:1,local:.306967,cost:true,en:'Standardized cost',vi:'Chi phí chuẩn hóa',min:0,max:1e9},
+ {id:'C22',g:1,local:.693033,cost:true,en:'Extra costs',vi:'Phát sinh phí',min:0,max:100},
+ {id:'C31',g:2,local:.828562,cost:false,en:'Network coverage',vi:'Độ phủ tuyến',min:0,max:100},
+ {id:'C32',g:2,local:.171438,cost:false,en:'Tracking technology',vi:'Theo dõi lô hàng',min:0,max:100},
+ {id:'C41',g:3,local:.785972,cost:false,en:'Legal profile',vi:'Chứng từ pháp lý',min:0,max:100},
+ {id:'C42',g:3,local:.214028,cost:false,en:'Insurance',vi:'Bảo hiểm/bồi thường',min:0,max:100},
+ {id:'C51',g:4,local:.383237,cost:true,en:'Quote response',vi:'Thời gian báo giá',min:0,max:1e9},
+ {id:'C52',g:4,local:.616763,cost:false,en:'Urgent acceptance',vi:'Nhận yêu cầu gấp',min:0,max:100}];
+const SEED=[
+ {name:'Knight Logistics',v:[91.9,99.1,18.2,7.0,60.6,67.3,78.4,74.2,4.1,74.4]},
+ {name:'Transimex',v:[93.9,99.6,19.8,3.9,89.2,94.7,97.7,94.6,2.4,84.6]},
+ {name:'Bee Logistics',v:[95.8,99.4,19.1,3.0,91.1,90.4,92.7,88.4,1.9,96.1]},
+ {name:'ITL Logistics',v:[94.9,99.5,19.4,3.6,96.7,97.0,97.9,93.6,2.2,90.6]},
+ {name:'Gemadept Logistics',v:[93.7,99.7,20.3,4.3,93.1,91.8,98.1,97.6,2.8,82.4]}];
+const BASE_PROFILES={
+ expert:{nameEN:'Expert baseline',nameVI:'Trọng số chuyên gia',w:[.338738,.112239,.154712,.303894,.090418]},
+ equal:{nameEN:'Equal weights',nameVI:'Chia đều',w:[.2,.2,.2,.2,.2]},
+ cost:{nameEN:'Cost-focused',nameVI:'Ưu tiên chi phí',w:[.16,.50,.14,.10,.10]},
+ service:{nameEN:'Service-focused',nameVI:'Ưu tiên dịch vụ',w:[.29,.08,.25,.13,.25]}
+};
+const TXT={
+ en:{nav_dash:'Dashboard',nav_data:'Data & Import',nav_prio:'Decision Priorities',nav_rank:'Current Ranking',nav_hist:'Historical Tracking',nav_built:'How the Tool Was Built',period:'Period',profile:'Priority profile',blackbox:'Black-box operating logic',blackbox_sub:'Business inputs → analytical engine → business outputs',input_title:'WPL enters',engine_title:'System calculates automatically',output_title:'WPL receives',current_summary:'Current decision summary',data_title:'Provider data & scalable import',data_sub:'The TOPSIS matrix is m × 10, where m can change dynamically.',scale_note:'Scalability:',add_provider:'+ Add provider',add_period:'+ Add period',import_csv:'Import CSV file(s)',export_period:'Export current period',backup:'Save full backup',restore:'Load full backup',export_portable:'Export portable app',portable_help:'Portable HTML opens directly on another computer with the current data embedded. JSON is only for backup and restore.',portable_exported:'Portable app exported. Open the downloaded HTML file directly in Chrome or Edge.',search_provider:'Search provider',csv_help:'Bulk CSV format: Period, Provider, C11, C12, C21, C22, C31, C32, C41, C42, C51, C52. If Period is absent, the tool uses a 4-digit year found in the filename, otherwise the currently selected period.',prio_title:'Decision priority profiles',prio_sub:'One dataset can be evaluated differently for different customers or shipment requirements.',weights:'Five main-criteria weights',profiles:'Ready-made / customer profiles',locked100:'Always locked at 100%',save_profile_name:'Save current weights as a customer profile',save_profile:'Save profile',local_weights:'Fixed local AHP weights',local_note:'These are retained from the expert survey unless WPL conducts a new AHP assessment.',rank_title:'Current TOPSIS ranking',hist_title:'Historical provider tracking',hist_sub:'Track rank, relative group position, TOPSIS score and KPI values across periods.',provider:'Provider',demo_history:'Load illustrative 3-year demo',rank_warning:'Do not interpret rank alone. Rank is relative to the competing provider set. The history view therefore shows rank, relative group position, TOPSIS score and raw KPI trends together.',rank_percentile:'Relative group position',history_table:'Period-by-period detail',policy_title:'Supplier relationship policy support',policy_sub:'Ranking informs the relationship decision; it does not automatically terminate a supplier.',policy_disclaimer:'Important:',policy_disclaimer2:'The rules below are proposed, configurable prototype rules — not an approved WPL policy. WPL management should validate thresholds before operational use.',select_supplier:'Select supplier',policy_settings:'Configurable policy thresholds',decline_points:'Percentile decline trigger',policy_logic:'Policy logic: critical KPI gate first; then current rank percentile and sustained trend. Termination is never automatic — severe cases trigger management review, corrective action and/or reduced allocation.',policy_ladder:'Proposed relationship-action ladder',built_title:'How the interface was created',built_sub:'From thesis methodology to software architecture',tech_title:'Prototype technology',prod_title:'What changes in a production version?',defense_answer:'Short defense answer'},
+ vi:{nav_dash:'Tổng quan',nav_data:'Dữ liệu & nhập file',nav_prio:'Mức độ ưu tiên',nav_rank:'Xếp hạng hiện tại',nav_hist:'Theo dõi theo thời gian',nav_built:'Cách xây dựng công cụ',period:'Kỳ/Năm',profile:'Hồ sơ ưu tiên',blackbox:'Cơ chế hộp đen',blackbox_sub:'Dữ liệu nghiệp vụ → bộ máy phân tích → đầu ra nghiệp vụ',input_title:'WPL nhập',engine_title:'Hệ thống tự tính',output_title:'WPL nhận',current_summary:'Tóm tắt quyết định hiện tại',data_title:'Dữ liệu nhà cung cấp & nhập dữ liệu lớn',data_sub:'Ma trận TOPSIS có dạng m × 10; số nhà cung cấp m có thể thay đổi.',scale_note:'Khả năng mở rộng:',add_provider:'+ Thêm nhà cung cấp',add_period:'+ Thêm kỳ/năm',import_csv:'Nhập nhiều file CSV',export_period:'Xuất kỳ hiện tại',backup:'Sao lưu toàn bộ',restore:'Nạp bản sao lưu',export_portable:'Xuất ứng dụng chạy độc lập',portable_help:'File HTML chạy độc lập có thể mở trực tiếp trên máy khác với dữ liệu hiện tại đã được nhúng sẵn. File JSON chỉ dùng để sao lưu và khôi phục.',portable_exported:'Đã xuất ứng dụng chạy độc lập. Chỉ cần mở file HTML vừa tải bằng Chrome hoặc Edge.',search_provider:'Tìm nhà cung cấp',csv_help:'Định dạng CSV hàng loạt: Period, Provider, C11, C12, C21, C22, C31, C32, C41, C42, C51, C52. Nếu không có Period, hệ thống lấy năm 4 chữ số từ tên file hoặc dùng kỳ đang chọn.',prio_title:'Hồ sơ ưu tiên quyết định',prio_sub:'Cùng một bộ dữ liệu có thể đánh giá khác nhau cho từng khách hàng/yêu cầu lô hàng.',weights:'5 trọng số nhóm chính',profiles:'Hồ sơ có sẵn / hồ sơ khách hàng',locked100:'Luôn khóa tổng ở 100%',save_profile_name:'Lưu trọng số hiện tại thành hồ sơ khách hàng',save_profile:'Lưu hồ sơ',local_weights:'Trọng số AHP cục bộ cố định',local_note:'Giữ theo khảo sát chuyên gia cho tới khi WPL thực hiện đánh giá AHP mới.',rank_title:'Xếp hạng TOPSIS hiện tại',hist_title:'Theo dõi nhà cung cấp theo thời gian',hist_sub:'Theo dõi thứ hạng, vị thế trong nhóm, điểm TOPSIS và các chỉ số KPI qua các kỳ.',provider:'Nhà cung cấp',demo_history:'Nạp demo minh họa 3 năm',rank_warning:'Không nên chỉ nhìn thứ hạng. Thứ hạng là tương đối so với tập nhà cung cấp cạnh tranh. Vì vậy hệ thống hiển thị đồng thời thứ hạng, vị thế trong nhóm, điểm TOPSIS và xu hướng KPI.',rank_percentile:'Vị thế trong nhóm',history_table:'Chi tiết từng kỳ',policy_title:'Hỗ trợ chính sách quan hệ nhà cung cấp',policy_sub:'Thứ hạng hỗ trợ quyết định quan hệ; không tự động chấm dứt hợp tác với nhà cung cấp.',policy_disclaimer:'Quan trọng:',policy_disclaimer2:'Các quy tắc dưới đây là đề xuất có thể cấu hình của nguyên mẫu — chưa phải chính sách WPL được phê duyệt. WPL cần xác nhận ngưỡng trước khi áp dụng thực tế.',select_supplier:'Chọn nhà cung cấp',policy_settings:'Ngưỡng chính sách có thể cấu hình',decline_points:'Ngưỡng giảm phân vị',policy_logic:'Logic: kiểm tra KPI trọng yếu trước, sau đó xem vị trí hiện tại và xu hướng kéo dài. Không tự động chấm dứt hợp tác — trường hợp nghiêm trọng sẽ chuyển sang quản lý rà soát, yêu cầu hành động khắc phục và/hoặc giảm phân bổ.',policy_ladder:'Thang hành động quan hệ đề xuất',built_title:'Giao diện này được tạo như thế nào',built_sub:'Từ methodology luận văn sang kiến trúc phần mềm',tech_title:'Công nghệ prototype',prod_title:'Bản production cần thay đổi gì?',defense_answer:'Câu trả lời ngắn khi bảo vệ'}
+};
+const EXTRA={
+en:{brand:'WPL Provider Decision-Support System',new_period_label:'New period / year',period_added:'New period added and selected.',period_exists:'This period already exists. It has been selected instead.',period_required:'Enter a period/year first.',history_window:'Tracking window',last_4_periods:'Latest 4 periods',last_5_periods:'Latest 5 periods',last_8_periods:'Latest 8 periods',all_periods:'All periods',custom_range:'Custom range',from_period:'From period',to_period:'To period',history_window_note:'The tracking window only changes what is displayed. All stored periods remain saved in the system.',brand_sub:'V3.9 · AHP–TOPSIS · ranking & monitoring prototype',sidefoot:'Prototype scope: decision support. Final supplier decisions remain with WPL management.',page_sub_dashboard:'Current evaluation, data coverage and system status',page_sub_data:'Dynamic provider and multi-period data management',page_sub_priority:'Customer / shipment-specific weighting profiles',page_sub_ranking:'Current-period TOPSIS result',page_sub_history:'Longitudinal monitoring across periods',page_sub_policy:'Configurable relationship-action support',badge_input:'INPUT',badge_blackbox:'BLACK BOX',badge_output:'OUTPUT',input_lines:'• Provider list\n• 10 performance indicators\n• Period\n• Customer / priority profile',engine_flow:'AHP-based weight structure → TOPSIS → scenario recalculation → historical comparison',output_lines:'• Ranking & recommendation\n• Backup provider\n• Historical trend\n• Simple management guidance',scale_full:'Scalability: the calculation is not hard-coded to five providers. 5, 80 or more provider rows can be imported. For operational deployment with very large multi-year datasets, a server/database should replace browser-local storage.',total_weight:'Total weight:',legend_topsis:'▲ TOPSIS score',thr_safety:'C12 Safety min %',thr_legal:'C41 Legal min %',thr_insurance:'C42 Insurance min %',policy_status_maintain:'MAINTAIN',policy_desc_maintain:'Strong current position + stable/improving trend + no critical breach.',policy_status_monitor:'MONITOR',policy_desc_monitor:'Acceptable performance but mild deterioration or mid-range position.',policy_status_improvement:'IMPROVEMENT PLAN',policy_desc_improvement:'Sustained deterioration or material percentile decline. Set corrective KPIs and review date.',policy_status_reduce:'REDUCE / REVIEW',policy_desc_reduce:'Critical KPI breach or persistent bottom-quartile performance. Reduce allocation, qualify backup, management review.',footer_note:'WPL Transportation Provider Decision-Support System V3.9 · Thesis prototype. Baseline 2025 provider data and AHP weights are derived from the thesis dataset. Additional sample-period data are illustrative and used only for interface testing unless explicitly validated by WPL.',providers:'Providers',periods_stored:'Periods stored',criteria:'Criteria',priority_profile:'Priority profile',recommended:'RECOMMENDED',backup_label:'Backup',need_two:'Need at least two complete provider rows.',scalability_badge:'SCALABILITY',scale_desc:'m = any practical provider count in the prototype; 10 = fixed thesis criteria; t = stored periods.',scale_server:'For very large enterprise datasets, move storage/calculation to a server database/API architecture.',provider_count_suffix:'providers',position_top:'Top {x}%',position_best:'Top provider',management_guidance:'Suggested management action',guidance_need_more:'Continue cooperation and collect more periods before making a trend-based decision.',guidance_improving:'Continue cooperation and routine monitoring. The provider is improving across the available periods.',guidance_stable:'Continue cooperation with routine monitoring. Performance is broadly stable.',guidance_declining:'Continue with closer monitoring. Request an improvement plan and management review before increasing future allocation.',guidance_mixed:'Continue with closer monitoring and review the underlying KPIs before changing allocation.',provider_col:'Provider',percentile_position:'relative position',decision_support_note:'Decision support only; check quotation, capacity, route, schedule, legal and insurance conditions before final selection.',scenario_comparison:'Priority scenario comparison',scenario:'Scenario',rank1:'Rank 1',current_rank:'Current rank',current_percentile:'Position in provider group',current_topsis:'Current decision score',trend:'Overall trend',no_history:'No multi-period history for this provider yet.',rank_trend_title:'Relative position over time',score_trend_title:'TOPSIS score over time',rank_label_note:'Labels show rank / provider count',topsis_score:'Decision score',score_note:'Higher means closer to the weighted ideal',trend_summary_title:'Trend summary',trend_summary_sub:'First period → latest period, shown with direction of change.',rank_movement:'Rank movement',percentile_change:'Relative position change',topsis_change:'Decision score change',critical_kpi_change:'Key KPI change',periods_available:'Periods available',first_to_latest:'First → latest',trend_assessment:'Overall assessment',trend_need_more:'At least two periods are required to evaluate a trend.',trend_declining_text:'The provider shows a material deterioration over the available periods. Review the underlying KPIs and consider corrective action.',trend_improving_text:'The provider shows a meaningful improvement over the available periods. Continue monitoring to confirm that the improvement is sustained.',trend_stable_text:'The provider is broadly stable across the available periods. Continue routine monitoring.',trend_mixed_text:'The signals are mixed: relative position and absolute TOPSIS performance do not move in the same direction. Review the KPI detail before taking action.',mixed:'Mixed',ontime_col:'C11 On-time delivery',period_col:'Period',rank_col:'Rank',providers_col:'Providers',rank_percentile_col:'Group position',safety_col:'C12 Safety',legal_col:'C41 Legal',insurance_col:'C42 Insurance',insufficient_history:'Insufficient history',improving:'Improving',declining:'Declining',stable:'Stable',no_history_plot:'No history to plot.',no_ranking_history:'No ranking history available.',rank_word:'Rank',percentile_word:'position',critical_breach:'One or more critical KPI thresholds are breached.',critical_action1:'Restrict critical shipments, verify root cause, require corrective action and qualify a backup provider.',critical_action2:'Do not terminate automatically; management reviews severity and corrective-action outcome.',status_reduce_review:'REDUCE / MANAGEMENT REVIEW',status_improve_reduce:'IMPROVEMENT PLAN / REDUCE ALLOCATION',status_improvement:'IMPROVEMENT PLAN',status_maintain:'MAINTAIN / STRATEGIC',status_monitor:'MONITOR',bottom_deteriorated:'Performance has materially deteriorated and the supplier is currently in the bottom quartile.',bottom_action:'Set corrective KPIs and a review date; temporarily reduce allocation and use backup providers.',decline_detected:'A sustained or material relative decline is detected.',decline_action:'Continue conditionally, agree corrective actions and review after the next evaluation period.',strong_position:'Current relative position is strong and there is no critical KPI breach.',maintain_action:'Maintain relationship and continue periodic monitoring.',acceptable_mid:'Performance is acceptable but not currently top-quartile.',monitor_action:'Continue relationship, monitor trend and maintain qualified alternatives.',new_provider:'New Provider',enter_period:'Enter new period/year (e.g., 2026):',required_headers:'Required headers missing',backup_restored:'Backup restored.',invalid_backup:'Invalid backup file.',enter_profile_name:'Enter a profile name.',delete_profile:'Delete profile',confirm_delete_profile:'Delete this customer profile?',demo_confirm:'Load illustrative 2026–2027 data? These are NOT thesis/WPL data and are only for demonstrating history tracking.',demo_loaded:'Illustrative demo loaded. 2026–2027 values are fictional and only demonstrate tracking.',load_baseline:'Restore 2025 thesis baseline',quick_cleanup:'Quick cleanup',selected_count:'selected',delete_selected:'Delete selected',undo_import:'Undo last import',clear_period:'Clear current period',reset_system:'Reset everything to thesis baseline',baseline_confirm:'Restore the original 2025 thesis dataset with 5 providers? This will overwrite the current 2025 data only.',baseline_loaded:'The original 2025 thesis baseline has been restored.',delete_selected_confirm:'Delete the selected providers from the current period?',delete_selected_done:'Selected providers were deleted.',undo_none:'There is no previous import to undo.',undo_confirm:'Undo the most recent CSV import and return to the data state immediately before it?',undo_done:'The most recent import has been undone.',clear_period_confirm:'Delete ALL providers in the currently selected period? Other periods will not be changed.',clear_period_done:'The current period has been cleared.',reset_system_confirm:'RESET THE ENTIRE SYSTEM? This removes all imported periods, added providers, custom customer profiles and custom settings, then restores the original 2025 thesis dataset with 5 providers. Save a full backup first if you may need the current data.',reset_system_done:'The entire system has been reset to the original 2025 thesis baseline.',import_failed:'Import failed: '},
+vi:{brand:'Hệ thống Hỗ trợ Ra quyết định Nhà cung cấp WPL',new_period_label:'Kỳ / năm mới',period_added:'Đã thêm và chọn kỳ mới.',period_exists:'Kỳ này đã tồn tại. Hệ thống đã chuyển sang kỳ đó.',period_required:'Hãy nhập kỳ/năm trước.',history_window:'Khoảng theo dõi',last_4_periods:'4 kỳ gần nhất',last_5_periods:'5 kỳ gần nhất',last_8_periods:'8 kỳ gần nhất',all_periods:'Tất cả các kỳ',custom_range:'Tùy chọn khoảng',from_period:'Từ kỳ',to_period:'Đến kỳ',history_window_note:'Khoảng theo dõi chỉ thay đổi phần hiển thị. Toàn bộ dữ liệu các kỳ đã lưu vẫn được giữ nguyên trong hệ thống.',brand_sub:'V3.9 · AHP–TOPSIS · nguyên mẫu xếp hạng & theo dõi',sidefoot:'Phạm vi nguyên mẫu: hỗ trợ ra quyết định. Quyết định cuối cùng về nhà cung cấp vẫn thuộc WPL.',page_sub_dashboard:'Đánh giá hiện tại, phạm vi dữ liệu và trạng thái hệ thống',page_sub_data:'Quản lý linh hoạt nhà cung cấp và dữ liệu nhiều kỳ',page_sub_priority:'Hồ sơ trọng số theo khách hàng / yêu cầu lô hàng',page_sub_ranking:'Kết quả TOPSIS của kỳ hiện tại',page_sub_history:'Theo dõi dài hạn qua nhiều kỳ',page_sub_policy:'Hỗ trợ hành động quan hệ có thể cấu hình',badge_input:'ĐẦU VÀO',badge_blackbox:'HỘP ĐEN',badge_output:'ĐẦU RA',input_lines:'• Danh sách nhà cung cấp\n• 10 chỉ số hiệu suất\n• Kỳ / năm\n• Hồ sơ khách hàng / mức ưu tiên',engine_flow:'Cấu trúc trọng số AHP → TOPSIS → tính lại kịch bản → so sánh lịch sử',output_lines:'• Xếp hạng & khuyến nghị\n• Nhà cung cấp dự phòng\n• Xu hướng lịch sử\n• Gợi ý quản lý đơn giản',scale_full:'Khả năng mở rộng: phép tính không bị cố định ở 5 nhà cung cấp. Có thể nhập 5, 80 hoặc nhiều hơn. Khi triển khai thực tế với dữ liệu rất lớn qua nhiều năm, nên thay bộ nhớ cục bộ của trình duyệt bằng máy chủ/cơ sở dữ liệu.',total_weight:'Tổng trọng số:',legend_topsis:'▲ Điểm TOPSIS',thr_safety:'C12 An toàn tối thiểu %',thr_legal:'C41 Pháp lý tối thiểu %',thr_insurance:'C42 Bảo hiểm tối thiểu %',policy_status_maintain:'DUY TRÌ',policy_desc_maintain:'Vị trí hiện tại mạnh + xu hướng ổn định/cải thiện + không vi phạm KPI trọng yếu.',policy_status_monitor:'THEO DÕI',policy_desc_monitor:'Hiệu suất chấp nhận được nhưng có suy giảm nhẹ hoặc nằm ở nhóm trung bình.',policy_status_improvement:'KẾ HOẠCH CẢI THIỆN',policy_desc_improvement:'Suy giảm kéo dài hoặc giảm phân vị đáng kể. Đặt KPI khắc phục và thời điểm đánh giá lại.',policy_status_reduce:'GIẢM PHÂN BỔ / RÀ SOÁT',policy_desc_reduce:'Vi phạm KPI trọng yếu hoặc liên tục ở nhóm 25% cuối. Giảm phân bổ, chuẩn bị nhà cung cấp dự phòng và đưa vào rà soát quản lý.',footer_note:'Hệ thống Hỗ trợ Ra quyết định Nhà cung cấp Vận tải WPL V3.9 · Nguyên mẫu phục vụ luận văn. Dữ liệu nhà cung cấp năm 2025 và trọng số AHP cơ sở được lấy từ bộ dữ liệu luận văn. Dữ liệu mẫu của các kỳ bổ sung chỉ dùng để kiểm thử giao diện nếu chưa được WPL xác nhận.',providers:'Nhà cung cấp',periods_stored:'Số kỳ đã lưu',criteria:'Tiêu chí',priority_profile:'Hồ sơ ưu tiên',recommended:'KHUYẾN NGHỊ',backup_label:'Dự phòng',need_two:'Cần ít nhất hai nhà cung cấp có dữ liệu đầy đủ.',scalability_badge:'KHẢ NĂNG MỞ RỘNG',scale_desc:'m = số lượng nhà cung cấp linh hoạt trong nguyên mẫu; 10 = số tiêu chí cố định của luận văn; t = số kỳ đã lưu.',scale_server:'Với dữ liệu doanh nghiệp rất lớn, nên chuyển lưu trữ/tính toán sang kiến trúc máy chủ, cơ sở dữ liệu hoặc API.',provider_count_suffix:'nhà cung cấp',position_top:'Top {x}%',position_best:'Nhà cung cấp dẫn đầu',management_guidance:'Gợi ý quản lý',guidance_need_more:'Tiếp tục hợp tác và thu thập thêm kỳ dữ liệu trước khi đưa ra quyết định dựa trên xu hướng.',guidance_improving:'Tiếp tục hợp tác và theo dõi định kỳ. Nhà cung cấp đang có xu hướng cải thiện.',guidance_stable:'Tiếp tục hợp tác và theo dõi định kỳ. Hiệu suất nhìn chung ổn định.',guidance_declining:'Tiếp tục hợp tác nhưng cần theo dõi chặt hơn. Yêu cầu kế hoạch cải thiện và quản lý rà soát trước khi tăng phân bổ trong tương lai.',guidance_mixed:'Tiếp tục theo dõi chặt hơn và xem các KPI nguyên nhân trước khi thay đổi phân bổ.',provider_col:'Nhà cung cấp',percentile_position:'vị thế tương đối',decision_support_note:'Chỉ hỗ trợ ra quyết định; trước khi chọn cuối cùng vẫn cần kiểm tra báo giá, năng lực, tuyến, lịch trình, pháp lý và điều kiện bảo hiểm.',scenario_comparison:'So sánh các kịch bản ưu tiên',scenario:'Kịch bản',rank1:'Hạng 1',current_rank:'Hạng hiện tại',current_percentile:'Vị thế trong nhóm',current_topsis:'Điểm quyết định hiện tại',trend:'Xu hướng tổng thể',no_history:'Chưa có lịch sử nhiều kỳ cho nhà cung cấp này.',rank_trend_title:'Vị trí tương đối theo thời gian',score_trend_title:'Điểm TOPSIS theo thời gian',rank_label_note:'Nhãn hiển thị hạng / số nhà cung cấp',topsis_score:'Điểm quyết định',score_note:'Càng cao càng gần phương án lý tưởng có trọng số',trend_summary_title:'Tóm tắt xu hướng',trend_summary_sub:'So sánh kỳ đầu → kỳ gần nhất và hướng thay đổi.',rank_movement:'Biến động thứ hạng',percentile_change:'Thay đổi vị thế',topsis_change:'Thay đổi điểm quyết định',critical_kpi_change:'Thay đổi KPI chính',periods_available:'Số kỳ có dữ liệu',first_to_latest:'Kỳ đầu → gần nhất',trend_assessment:'Đánh giá tổng thể',trend_need_more:'Cần ít nhất hai kỳ để đánh giá xu hướng.',trend_declining_text:'Nhà cung cấp có dấu hiệu suy giảm đáng kể trong các kỳ hiện có. Cần xem các KPI nguyên nhân và cân nhắc hành động khắc phục.',trend_improving_text:'Nhà cung cấp có xu hướng cải thiện đáng kể trong các kỳ hiện có. Tiếp tục theo dõi để xác nhận cải thiện được duy trì.',trend_stable_text:'Nhà cung cấp nhìn chung ổn định trong các kỳ hiện có. Tiếp tục theo dõi định kỳ.',trend_mixed_text:'Các tín hiệu chưa đồng nhất: vị trí tương đối và điểm TOPSIS tuyệt đối không đi cùng một hướng. Cần xem chi tiết KPI trước khi hành động.',mixed:'Hỗn hợp',ontime_col:'C11 Giao đúng hạn',period_col:'Kỳ',rank_col:'Hạng',providers_col:'Số nhà cung cấp',rank_percentile_col:'Vị thế trong nhóm',safety_col:'C12 An toàn',legal_col:'C41 Pháp lý',insurance_col:'C42 Bảo hiểm',insufficient_history:'Chưa đủ dữ liệu lịch sử',improving:'Đang cải thiện',declining:'Đang suy giảm',stable:'Ổn định',no_history_plot:'Chưa có lịch sử để vẽ biểu đồ.',no_ranking_history:'Chưa có lịch sử xếp hạng.',rank_word:'Hạng',percentile_word:'vị thế',critical_breach:'Có ít nhất một KPI trọng yếu thấp hơn ngưỡng.',critical_action1:'Hạn chế giao lô hàng quan trọng, xác minh nguyên nhân, yêu cầu hành động khắc phục và chuẩn bị nhà cung cấp dự phòng.',critical_action2:'Không tự động chấm dứt hợp tác; quản lý sẽ xem xét mức độ nghiêm trọng và kết quả khắc phục.',status_reduce_review:'GIẢM PHÂN BỔ / RÀ SOÁT QUẢN LÝ',status_improve_reduce:'KẾ HOẠCH CẢI THIỆN / GIẢM PHÂN BỔ',status_improvement:'KẾ HOẠCH CẢI THIỆN',status_maintain:'DUY TRÌ / CHIẾN LƯỢC',status_monitor:'THEO DÕI',bottom_deteriorated:'Hiệu suất đã suy giảm đáng kể và nhà cung cấp hiện nằm trong nhóm 25% cuối.',bottom_action:'Đặt KPI khắc phục và ngày đánh giá lại; tạm thời giảm phân bổ và sử dụng nhà cung cấp dự phòng.',decline_detected:'Phát hiện xu hướng suy giảm tương đối kéo dài hoặc đáng kể.',decline_action:'Tiếp tục hợp tác có điều kiện, thống nhất hành động khắc phục và đánh giá lại ở kỳ tiếp theo.',strong_position:'Vị trí tương đối hiện tại mạnh và không có vi phạm KPI trọng yếu.',maintain_action:'Duy trì quan hệ và tiếp tục theo dõi định kỳ.',acceptable_mid:'Hiệu suất chấp nhận được nhưng hiện chưa thuộc nhóm 25% dẫn đầu.',monitor_action:'Tiếp tục quan hệ, theo dõi xu hướng và duy trì các phương án dự phòng đủ điều kiện.',new_provider:'Nhà cung cấp mới',enter_period:'Nhập kỳ/năm mới (ví dụ: 2026):',required_headers:'Thiếu tiêu đề cột bắt buộc',backup_restored:'Đã khôi phục bản sao lưu.',invalid_backup:'File sao lưu không hợp lệ.',enter_profile_name:'Hãy nhập tên hồ sơ.',delete_profile:'Xóa hồ sơ',confirm_delete_profile:'Xóa hồ sơ khách hàng này?',demo_confirm:'Nạp dữ liệu minh họa 2026–2027? Đây KHÔNG phải dữ liệu luận văn/WPL và chỉ dùng để minh họa chức năng theo dõi lịch sử.',demo_loaded:'Đã nạp dữ liệu minh họa. Các giá trị 2026–2027 là dữ liệu giả lập chỉ để minh họa chức năng theo dõi.',load_baseline:'Khôi phục dữ liệu gốc 2025',quick_cleanup:'Xử lý nhanh dữ liệu',selected_count:'đã chọn',delete_selected:'Xóa các dòng đã chọn',undo_import:'Hoàn tác lần nhập gần nhất',clear_period:'Xóa toàn bộ kỳ hiện tại',reset_system:'Khôi phục toàn bộ về dữ liệu gốc',baseline_confirm:'Khôi phục bộ dữ liệu luận văn gốc năm 2025 với 5 nhà cung cấp? Thao tác này chỉ ghi đè dữ liệu 2025 hiện tại.',baseline_loaded:'Đã khôi phục bộ dữ liệu gốc luận văn năm 2025.',delete_selected_confirm:'Xóa các nhà cung cấp đã chọn khỏi kỳ hiện tại?',delete_selected_done:'Đã xóa các nhà cung cấp đã chọn.',undo_none:'Chưa có lần nhập file nào để hoàn tác.',undo_confirm:'Hoàn tác lần nhập CSV gần nhất và quay về trạng thái dữ liệu ngay trước lần nhập đó?',undo_done:'Đã hoàn tác lần nhập gần nhất.',clear_period_confirm:'Xóa TOÀN BỘ nhà cung cấp trong kỳ đang chọn? Các kỳ khác sẽ không bị ảnh hưởng.',clear_period_done:'Đã xóa toàn bộ dữ liệu của kỳ hiện tại.',reset_system_confirm:'KHÔI PHỤC TOÀN BỘ HỆ THỐNG? Thao tác này sẽ xóa các kỳ đã nhập, nhà cung cấp thêm vào, hồ sơ khách hàng tự tạo và thiết lập tùy chỉnh; sau đó khôi phục đúng dữ liệu luận văn 2025 với 5 nhà cung cấp. Hãy sao lưu toàn bộ trước nếu bạn có thể cần lại dữ liệu hiện tại.',reset_system_done:'Đã khôi phục toàn bộ hệ thống về dữ liệu gốc luận văn 2025.',import_failed:'Nhập file thất bại: '}}
+Object.assign(EXTRA.en,{
+  brand_sub:'V3.9 · black-box AHP–TOPSIS decision support',
+  sidefoot:'Decision-support prototype. Business users manage inputs and review outputs; AHP–TOPSIS calculations stay in the background.',
+  page_sub_dashboard:'Start here: data → priorities → ranking → history',
+  page_sub_data:'Period-based provider data management',
+  page_sub_priority:'Choose a preset profile or run a custom what-if',
+  page_sub_ranking:'Current-period recommendation and complete ranking',
+  page_sub_history:'Track the same provider across stored periods',
+  start_here:'START HERE',
+  purpose_title:'One simple workflow from provider data to a management-ready ranking',
+  purpose_text:'WPL users provide business inputs. AHP-based weights and TOPSIS calculations stay in the background. The interface returns a ranking, backup option and historical trend without requiring users to calculate MCDM manually.',
+  workflow_title:'Use the system in 4 steps',workflow_sub:'Follow left to right. Advanced controls are hidden unless needed.',
+  step1_title:'Load provider data',step1_desc:'Choose a period, import CSV data or add/edit providers directly.',
+  step2_title:'Set decision priorities',step2_desc:'Use the expert baseline or select a cost/service/customer-specific profile.',
+  step3_title:'Review ranking',step3_desc:'See the recommended provider, backup provider and full TOPSIS ranking.',
+  step4_title:'Check history',step4_desc:'Track the same provider across periods and review trend-based guidance.',
+  method_background:'What happens in the background?',
+  data_title:'Provider data',data_sub:'Manage provider records by period. Import in bulk or edit directly.',
+  choose_period_title:'Choose or create a period',add_data_title:'Add provider data',download_sample:'Download 4-year sample CSV',
+  csv_simple_note:'For routine use, CSV import is the fastest option. The same file may contain multiple years/periods.',
+  selected_rows:'Selected rows:',advanced_data_tools:'Advanced data management, backup & transfer',
+  backup_transfer_title:'Backup & transfer',backup_transfer_desc:'Use these only when saving, restoring or moving the tool between computers.',
+  file_type_guide:'CSV = provider data import. JSON = full-system backup. Portable HTML = open the current system state directly on another computer.',
+  recovery_cleanup_title:'Recovery & cleanup',recovery_cleanup_desc:'Use when a file was imported by mistake or you want to return to the thesis baseline.',
+  priority_tip:'For the thesis baseline, select Expert baseline. Custom sliders are a what-if sensitivity setting, not a new AHP survey.',
+  method_details:'Method details: fixed local AHP weights',compare_scenarios:'Compare preset priority scenarios',
+  history_tip:'Historical tracking works when the provider name is consistent across periods. The display window does not delete older data.',
+  data_ready:'DATA READY',data_ready_desc:'{providers} valid providers in {period}; {periods} period(s) stored.',
+  position_best:'Rank 1 / {n}',position_outanks:'Rank {rank}/{n} · Outranks {out}/{others} others',
+  relative_best:'Best',relative_high:'Upper',relative_mid:'Middle',relative_low:'Lower',relative_bottom:'Bottom',
+  sample_downloaded:'4-year sample CSV downloaded.',
+  csv_help:'Required CSV columns: Period, Provider, C11, C12, C21, C22, C31, C32, C41, C42, C51, C52. One CSV may contain multiple periods.'
+});
+Object.assign(EXTRA.vi,{
+  brand_sub:'V3.9 · hỗ trợ quyết định AHP–TOPSIS dạng hộp đen',
+  sidefoot:'Nguyên mẫu hỗ trợ ra quyết định. Người dùng doanh nghiệp quản lý đầu vào và xem đầu ra; phép tính AHP–TOPSIS nằm phía sau giao diện.',
+  page_sub_dashboard:'Bắt đầu tại đây: dữ liệu → ưu tiên → xếp hạng → lịch sử',
+  page_sub_data:'Quản lý dữ liệu nhà cung cấp theo kỳ',
+  page_sub_priority:'Chọn hồ sơ có sẵn hoặc chạy kịch bản tùy chỉnh',
+  page_sub_ranking:'Khuyến nghị và xếp hạng đầy đủ của kỳ hiện tại',
+  page_sub_history:'Theo dõi cùng một nhà cung cấp qua các kỳ đã lưu',
+  start_here:'BẮT ĐẦU TẠI ĐÂY',
+  purpose_title:'Một quy trình đơn giản từ dữ liệu nhà cung cấp đến kết quả xếp hạng phục vụ quản lý',
+  purpose_text:'Người dùng WPL chỉ nhập dữ liệu nghiệp vụ. Trọng số AHP và phép tính TOPSIS được xử lý ở phía sau. Giao diện trả về xếp hạng, nhà cung cấp dự phòng và xu hướng lịch sử mà không yêu cầu người dùng tự tính MCDM.',
+  workflow_title:'Sử dụng hệ thống theo 4 bước',workflow_sub:'Đi từ trái sang phải. Các công cụ nâng cao được ẩn khi chưa cần.',
+  step1_title:'Nạp dữ liệu nhà cung cấp',step1_desc:'Chọn kỳ, nhập CSV hoặc thêm/chỉnh nhà cung cấp trực tiếp.',
+  step2_title:'Chọn mức độ ưu tiên',step2_desc:'Dùng Expert baseline hoặc chọn hồ sơ ưu tiên chi phí, dịch vụ hay khách hàng.',
+  step3_title:'Xem xếp hạng',step3_desc:'Xem nhà cung cấp khuyến nghị, phương án dự phòng và toàn bộ xếp hạng TOPSIS.',
+  step4_title:'Kiểm tra lịch sử',step4_desc:'Theo dõi cùng một nhà cung cấp qua nhiều kỳ và xem gợi ý dựa trên xu hướng.',
+  method_background:'Điều gì được tính ở phía sau?',
+  data_title:'Dữ liệu nhà cung cấp',data_sub:'Quản lý dữ liệu theo từng kỳ. Có thể nhập hàng loạt hoặc chỉnh trực tiếp.',
+  choose_period_title:'Chọn hoặc tạo kỳ',add_data_title:'Thêm dữ liệu nhà cung cấp',download_sample:'Tải CSV mẫu 4 năm',
+  csv_simple_note:'Trong sử dụng thông thường, nhập CSV là nhanh nhất. Một file có thể chứa nhiều năm/kỳ.',
+  selected_rows:'Các dòng đã chọn:',advanced_data_tools:'Quản lý dữ liệu, sao lưu & chuyển máy nâng cao',
+  backup_transfer_title:'Sao lưu & chuyển máy',backup_transfer_desc:'Chỉ dùng khi cần lưu, khôi phục hoặc chuyển hệ thống sang máy khác.',
+  file_type_guide:'CSV = nhập dữ liệu nhà cung cấp. JSON = sao lưu toàn bộ hệ thống. Portable HTML = mở trực tiếp trạng thái hiện tại trên máy khác.',
+  recovery_cleanup_title:'Khôi phục & dọn dữ liệu',recovery_cleanup_desc:'Dùng khi nhập nhầm file hoặc muốn quay về dữ liệu gốc luận văn.',
+  priority_tip:'Với kết quả gốc của luận văn, chọn Expert baseline. Thanh trượt tùy chỉnh là kịch bản what-if/sensitivity, không phải khảo sát AHP mới.',
+  method_details:'Chi tiết phương pháp: trọng số AHP cục bộ cố định',compare_scenarios:'So sánh các kịch bản ưu tiên có sẵn',
+  history_tip:'Theo dõi lịch sử hoạt động khi tên nhà cung cấp được giữ nhất quán giữa các kỳ. Đổi khoảng hiển thị không xóa dữ liệu cũ.',
+  data_ready:'DỮ LIỆU SẴN SÀNG',data_ready_desc:'{providers} nhà cung cấp hợp lệ trong {period}; đã lưu {periods} kỳ.',
+  position_best:'Hạng 1/{n}',position_outanks:'Hạng {rank}/{n} · Xếp trên {out}/{others} NCC khác',
+  relative_best:'Tốt nhất',relative_high:'Nhóm trên',relative_mid:'Trung bình',relative_low:'Nhóm dưới',relative_bottom:'Thấp nhất',
+  sample_downloaded:'Đã tải CSV mẫu 4 năm.',
+  csv_help:'Các cột CSV bắt buộc: Period, Provider, C11, C12, C21, C22, C31, C32, C41, C42, C51, C52. Một CSV có thể chứa nhiều kỳ.'
+});
+
+Object.assign(EXTRA.en,{
+  nav_data:'Provider Data',
+  nav_rank:'Recommendation',
+  nav_hist:'Performance History',
+  page_sub_data:'Load and manage provider data by period',
+  page_sub_priority:'Choose the business priority for the current decision',
+  page_sub_ranking:'Recommended provider, backup option and full ranking',
+  page_sub_history:'Track provider performance across stored periods',
+  rank_title:'Provider recommendation & ranking',
+  hist_title:'Provider performance history',
+  score_trend_title:'Decision score over time',
+  score_note:'Decision score = TOPSIS result; higher is better',
+  custom_whatif:'Custom what-if / customer-specific priority',
+  save_custom_profile:'Save this custom setting',
+  save_custom_profile_note:'Save only when this priority mix will be reused for a customer or shipment type.',
+  next_priority:'Next: Set decision priorities',
+  next_ranking:'Next: View recommendation',
+  next_history:'Next: Check performance history',
+  prio_sub:'Choose the business priority for this decision. The thesis baseline is the default.',
+  priority_tip:'For the thesis result, use Expert baseline. Use other profiles only to test how the ranking changes when priorities change.',
+  profiles:'Choose a priority profile',
+  weights:'Adjust five business priorities',
+  save_profile_name:'Profile name'
+});
+Object.assign(EXTRA.vi,{
+  nav_data:'Dữ liệu NCC',
+  nav_rank:'Khuyến nghị',
+  nav_hist:'Lịch sử hiệu suất',
+  page_sub_data:'Nạp và quản lý dữ liệu nhà cung cấp theo kỳ',
+  page_sub_priority:'Chọn mức độ ưu tiên cho quyết định hiện tại',
+  page_sub_ranking:'Nhà cung cấp khuyến nghị, phương án dự phòng và xếp hạng đầy đủ',
+  page_sub_history:'Theo dõi hiệu suất nhà cung cấp qua các kỳ đã lưu',
+  rank_title:'Khuyến nghị & xếp hạng nhà cung cấp',
+  hist_title:'Lịch sử hiệu suất nhà cung cấp',
+  score_trend_title:'Điểm quyết định theo thời gian',
+  score_note:'Điểm quyết định = kết quả TOPSIS; càng cao càng tốt',
+  custom_whatif:'Tùy chỉnh what-if / ưu tiên riêng theo khách hàng',
+  save_custom_profile:'Lưu thiết lập tùy chỉnh này',
+  save_custom_profile_note:'Chỉ lưu khi bạn sẽ dùng lại mức ưu tiên này cho một khách hàng hoặc loại lô hàng.',
+  next_priority:'Tiếp theo: Chọn mức độ ưu tiên',
+  next_ranking:'Tiếp theo: Xem khuyến nghị',
+  next_history:'Tiếp theo: Xem lịch sử hiệu suất',
+  prio_sub:'Chọn mức độ ưu tiên nghiệp vụ cho quyết định hiện tại. Kết quả luận văn dùng Expert baseline.',
+  priority_tip:'Để xem đúng kết quả gốc của luận văn, dùng Expert baseline. Các hồ sơ khác chỉ dùng để kiểm tra xếp hạng thay đổi thế nào khi mức ưu tiên thay đổi.',
+  profiles:'Chọn hồ sơ ưu tiên',
+  weights:'Điều chỉnh 5 nhóm ưu tiên nghiệp vụ',
+  save_profile_name:'Tên hồ sơ'
+});
+
+Object.assign(EXTRA.en,{
+  overview_badge:'DECISION OVERVIEW',
+  overview_title:'Current provider decision at a glance',
+  overview_text:'This page summarizes the selected period, available provider data, active priority setting and current recommendation.',
+  current_summary_sub:'Use this as the management snapshot before opening detailed pages.',
+  quick_actions:'Quick actions',
+  quick_actions_sub:'Go directly to the task you need.',
+  qa_data:'Manage provider data',
+  qa_data_desc:'Import, add, edit or remove provider records.',
+  qa_priority:'Set priorities',
+  qa_priority_desc:'Choose the thesis baseline or a different business scenario.',
+  qa_rank:'View recommendation',
+  qa_rank_desc:'See the recommended and backup provider with full ranking.',
+  qa_history:'Review performance history',
+  qa_history_desc:'Compare the same provider across stored periods.',
+  current_period:'Current period',
+  valid_providers:'Valid providers',
+  stored_periods:'Stored periods',
+  active_priority:'Active priority',
+  decision_score:'Decision score',
+  data_status:'Data status',
+  data_status_ready:'{valid} valid of {total} rows are ready for ranking.',
+  data_status_check:'{invalid} row(s) need correction before they can be ranked.',
+  clear_period_note:'This removes all provider rows in the selected period only. Other periods are not affected.',
+  manage_rows_title:'Review or remove provider rows',
+  delete_rows_note:'Tick one or more rows, then choose Delete selected. The × button at the end of a row deletes one provider only.'
+});
+Object.assign(EXTRA.vi,{
+  overview_badge:'TỔNG QUAN QUYẾT ĐỊNH',
+  overview_title:'Tóm tắt quyết định nhà cung cấp hiện tại',
+  overview_text:'Trang này tóm tắt kỳ đang chọn, dữ liệu nhà cung cấp hiện có, mức độ ưu tiên đang dùng và khuyến nghị hiện tại.',
+  current_summary_sub:'Dùng phần này như ảnh chụp nhanh cho quản lý trước khi mở các trang chi tiết.',
+  quick_actions:'Thao tác nhanh',
+  quick_actions_sub:'Đi thẳng đến chức năng bạn cần.',
+  qa_data:'Quản lý dữ liệu NCC',
+  qa_data_desc:'Nhập, thêm, sửa hoặc xóa dữ liệu nhà cung cấp.',
+  qa_priority:'Chọn mức độ ưu tiên',
+  qa_priority_desc:'Dùng mức gốc của luận văn hoặc chọn một kịch bản nghiệp vụ khác.',
+  qa_rank:'Xem khuyến nghị',
+  qa_rank_desc:'Xem nhà cung cấp đề xuất, phương án dự phòng và toàn bộ xếp hạng.',
+  qa_history:'Xem lịch sử hiệu suất',
+  qa_history_desc:'So sánh cùng một nhà cung cấp qua các kỳ đã lưu.',
+  current_period:'Kỳ hiện tại',
+  valid_providers:'NCC hợp lệ',
+  stored_periods:'Số kỳ đã lưu',
+  active_priority:'Mức ưu tiên đang dùng',
+  decision_score:'Điểm quyết định',
+  data_status:'Trạng thái dữ liệu',
+  data_status_ready:'{valid}/{total} dòng hợp lệ và sẵn sàng để xếp hạng.',
+  data_status_check:'Có {invalid} dòng cần sửa trước khi được đưa vào xếp hạng.',
+  clear_period_note:'Nút này chỉ xóa toàn bộ dòng nhà cung cấp của kỳ đang chọn. Các kỳ khác không bị ảnh hưởng.',
+  manage_rows_title:'Kiểm tra hoặc xóa dòng nhà cung cấp',
+  delete_rows_note:'Tick một hoặc nhiều dòng rồi chọn Xóa các dòng đã chọn. Nút × cuối mỗi dòng chỉ xóa một nhà cung cấp.'
+});
+
+Object.assign(EXTRA.en,{
+  trend_improved:'Improved',
+  trend_declined:'Declined',
+  trend_unchanged:'Stable',
+  trend_rule_note:'Trend labels are prototype indicators based on changes in relative position and decision score; they are not an official WPL supplier policy.'
+});
+Object.assign(EXTRA.vi,{
+  trend_improved:'Cải thiện',
+  trend_declined:'Suy giảm',
+  trend_unchanged:'Ổn định',
+  trend_rule_note:'Nhãn xu hướng chỉ là chỉ báo của nguyên mẫu dựa trên thay đổi vị thế tương đối và điểm quyết định; không phải chính sách nhà cung cấp chính thức của WPL.'
+});
+
+Object.assign(EXTRA.en,{
+  import_mode:'Import mode',
+  import_replace:'Replace periods in file (recommended)',
+  import_merge:'Merge / update existing data',
+  import_mode_note:'Replace is safest when loading a complete dataset for a period: old rows in the imported periods are cleared first. Merge keeps existing rows and only updates matching provider names.',
+  import_done_replace:'Imported in Replace mode',
+  import_done_merge:'Imported in Merge mode',
+  load_baseline:'Restore 2025 thesis baseline only',
+  load_baseline_note:'Restores only the original five providers in 2025. Other periods remain unchanged.',
+  clear_all_provider_data:'Clear all provider data',
+  clear_all_provider_data_note:'Deletes provider rows from every stored period and leaves one empty 2025 period. Priority profiles are kept.',
+  clear_all_provider_data_confirm:'This will delete provider data from ALL stored periods. Continue?',
+  clear_all_provider_data_done:'All provider data have been cleared. An empty 2025 period is ready for new data.',
+  reset_system:'Clear all test data & restore thesis baseline',
+  reset_system_note:'Recommended after testing: removes all imported periods, custom profiles and changes, then restores 2025 with the five original thesis providers and Expert baseline.',
+  reset_system_confirm:'This will remove ALL imported periods, added providers, custom profiles and custom settings, then restore the original 2025 thesis baseline. Continue?',
+  reset_system_done:'System reset complete. Only the original 2025 thesis dataset remains.'
+});
+Object.assign(EXTRA.vi,{
+  import_mode:'Cách nhập dữ liệu',
+  import_replace:'Thay thế dữ liệu của các kỳ trong file (khuyên dùng)',
+  import_merge:'Gộp / cập nhật vào dữ liệu hiện có',
+  import_mode_note:'Chọn Thay thế khi file chứa bộ dữ liệu đầy đủ của một kỳ: hệ thống sẽ xóa dữ liệu cũ của các kỳ có trong file rồi nạp lại. Chọn Gộp khi muốn giữ dữ liệu cũ và chỉ cập nhật/thêm nhà cung cấp.',
+  import_done_replace:'Đã nhập theo chế độ Thay thế',
+  import_done_merge:'Đã nhập theo chế độ Gộp',
+  load_baseline:'Khôi phục riêng dữ liệu gốc 2025',
+  load_baseline_note:'Chỉ đưa năm 2025 về đúng 5 nhà cung cấp gốc. Các kỳ khác vẫn được giữ nguyên.',
+  clear_all_provider_data:'Xóa toàn bộ dữ liệu nhà cung cấp',
+  clear_all_provider_data_note:'Xóa dữ liệu nhà cung cấp của tất cả các kỳ và để lại một kỳ 2025 trống. Các hồ sơ ưu tiên vẫn được giữ.',
+  clear_all_provider_data_confirm:'Thao tác này sẽ xóa dữ liệu nhà cung cấp của TẤT CẢ các kỳ đã lưu. Tiếp tục?',
+  clear_all_provider_data_done:'Đã xóa toàn bộ dữ liệu nhà cung cấp. Hệ thống để lại kỳ 2025 trống để nhập dữ liệu mới.',
+  reset_system:'Xóa toàn bộ dữ liệu test & về dữ liệu gốc luận văn',
+  reset_system_note:'Khuyên dùng sau khi test: xóa toàn bộ kỳ đã nhập, nhà cung cấp thêm vào, hồ sơ tùy chỉnh và thiết lập thay đổi; sau đó khôi phục 2025 với 5 nhà cung cấp gốc và Expert baseline.',
+  reset_system_confirm:'Thao tác này sẽ xóa TẤT CẢ kỳ đã nhập, nhà cung cấp thêm vào, hồ sơ tùy chỉnh và thiết lập tùy chỉnh; sau đó khôi phục dữ liệu gốc luận văn 2025. Tiếp tục?',
+  reset_system_done:'Đã khôi phục toàn bộ hệ thống. Hiện chỉ còn bộ dữ liệu gốc luận văn năm 2025.'
+});
+
+Object.assign(EXTRA.en,{
+  hist_sub:'Track one provider over time or compare the leading provider group by period.',
+  history_tab_individual:'Individual provider',
+  history_tab_top:'Top providers',
+  top_history_note:'This view uses the currently selected Decision Priority. It shows the strongest providers in one period and how those providers ranked in other stored periods.',
+  top_period:'Period',
+  show_top:'Show',
+  top_ranking_title:'Top providers in selected period',
+  top_ranking_sub:'Decision score is the TOPSIS closeness coefficient under the active priority profile.',
+  movement_title:'Rank movement across periods',
+  movement_sub:'The rows below are the selected period\'s Top providers. A dash means that provider did not exist in that period.',
+  top_provider_count:'Providers ranked',
+  top_cutoff_score:'Top-list cutoff score',
+  leader_score:'Leader score',
+  leader_provider:'Leader',
+  position_group:'Position in group',
+  not_available_short:'—'
+});
+Object.assign(EXTRA.vi,{
+  hist_sub:'Theo dõi một nhà cung cấp qua thời gian hoặc so sánh nhóm nhà cung cấp dẫn đầu theo từng kỳ.',
+  history_tab_individual:'Lịch sử từng NCC',
+  history_tab_top:'Nhóm NCC dẫn đầu',
+  top_history_note:'Phần này dùng đúng Mức độ ưu tiên đang được chọn. Hệ thống hiển thị nhóm nhà cung cấp mạnh nhất của một kỳ và thứ hạng của chính nhóm đó ở các kỳ khác.',
+  top_period:'Kỳ / năm',
+  show_top:'Hiển thị',
+  top_ranking_title:'Nhóm nhà cung cấp dẫn đầu trong kỳ đã chọn',
+  top_ranking_sub:'Điểm quyết định là hệ số gần lý tưởng TOPSIS theo mức độ ưu tiên đang dùng.',
+  movement_title:'Biến động thứ hạng qua các kỳ',
+  movement_sub:'Các dòng bên dưới là nhóm Top của kỳ đang chọn. Dấu gạch ngang nghĩa là nhà cung cấp đó chưa có dữ liệu ở kỳ đó.',
+  top_provider_count:'Số NCC được xếp hạng',
+  top_cutoff_score:'Điểm thấp nhất trong nhóm Top',
+  leader_score:'Điểm NCC dẫn đầu',
+  leader_provider:'NCC dẫn đầu',
+  position_group:'Vị thế trong nhóm',
+  not_available_short:'—'
+});
+
+function tr(k){return (EXTRA[lang]&&EXTRA[lang][k])||(TXT[lang]&&TXT[lang][k])||k}
+let lang='en';
+let selectedRows=new Set();
+
+/*
+ Portable-app payload.
+ The normal thesis app keeps these two values empty.
+ When "Export portable app" is used, the exported HTML receives:
+  - a unique instance ID (separate browser storage)
+  - an embedded snapshot of the current database
+*/
+const PORTABLE_INSTANCE_ID='';
+const PORTABLE_STATE_B64='';
+const STORAGE_KEY='wpl_v2_state'+(PORTABLE_INSTANCE_ID?':'+PORTABLE_INSTANCE_ID:'');
+const SNAPSHOT_KEY=STORAGE_KEY+'_last_import_snapshot';
+
+function normalizeState(x){
+  if(!x||!x.periods)return null;
+  if(!x.historyWindow)x.historyWindow='4';
+  if(x.historyFrom===undefined)x.historyFrom='';
+  if(x.historyTo===undefined)x.historyTo='';
+  if(!x.historyTab)x.historyTab='individual';
+  if(x.topHistoryPeriod===undefined)x.topHistoryPeriod='';
+  if(!x.topHistoryN)x.topHistoryN='10';
+  return x;
+}
+function decodePortableState(){
+  if(!PORTABLE_STATE_B64)return null;
+  try{
+    const bytes=Uint8Array.from(atob(PORTABLE_STATE_B64),c=>c.charCodeAt(0));
+    return normalizeState(JSON.parse(new TextDecoder().decode(bytes)));
+  }catch(e){return null}
+}
+function defaultState(){return {periods:{'2025':SEED.map(x=>({name:x.name,v:x.v.slice()}))},profiles:{},activePeriod:'2025',activeProfile:'expert',customW:BASE_PROFILES.expert.w.slice(),historyWindow:'4',historyFrom:'',historyTo:'',historyTab:'individual',topHistoryPeriod:'',topHistoryN:'10'};}
+function loadState(){
+  try{
+    const x=normalizeState(JSON.parse(localStorage.getItem(STORAGE_KEY)));
+    if(x)return x;
+  }catch(e){}
+  const portable=decodePortableState();
+  return portable||defaultState();
+}
+let db=loadState();
+function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(db));}
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sum=a=>a.reduce((x,y)=>x+(+y||0),0); const f=(x,d=4)=>Number.isFinite(x)?x.toFixed(d):'—';
+function profileMap(){return {...BASE_PROFILES,...db.profiles,custom:{nameEN:'Current custom',nameVI:'Tùy chỉnh hiện tại',w:db.customW.slice()}}}
+function activeWeights(){const p=profileMap()[db.activeProfile];return p?p.w.slice():db.customW.slice()}
+function globalWeights(mainW){const s=sum(mainW)||1;return CRIT.map(c=>(mainW[c.g]/s)*c.local)}
+function validRows(period){return (db.periods[period]||[]).filter(r=>r.name&&r.v.length===10&&r.v.every((v,j)=>Number.isFinite(+v)&&+v>=CRIT[j].min&&+v<=CRIT[j].max))}
+function topsis(rows,mainW){if(rows.length<2)return null;const W=globalWeights(mainW);const R=rows.map(()=>Array(10).fill(0));for(let j=0;j<10;j++){const den=Math.sqrt(sum(rows.map(r=>(+r.v[j])**2)));for(let i=0;i<rows.length;i++)R[i][j]=den?+rows[i].v[j]/den:0}const V=R.map(row=>row.map((x,j)=>x*W[j]));const Ap=CRIT.map((c,j)=>{const col=V.map(r=>r[j]);return c.cost?Math.min(...col):Math.max(...col)});const Am=CRIT.map((c,j)=>{const col=V.map(r=>r[j]);return c.cost?Math.max(...col):Math.min(...col)});const out=rows.map((r,i)=>{let sp=0,sm=0;for(let j=0;j<10;j++){sp+=(V[i][j]-Ap[j])**2;sm+=(V[i][j]-Am[j])**2}sp=Math.sqrt(sp);sm=Math.sqrt(sm);return{name:r.name,ci:(sp+sm)?sm/(sp+sm):0,sp,sm,row:r}}).sort((a,b)=>b.ci-a.ci);out.forEach((o,i)=>o.rank=i+1);return {out,W,R,V,Ap,Am}}
+function periodsSorted(){return Object.keys(db.periods).sort((a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true}))}
+function providerNames(){return [...new Set(Object.values(db.periods).flat().map(r=>r.name).filter(Boolean))].sort()}
+function renderSelectors(){const ps=periodsSorted();['globalPeriod','dataPeriod'].forEach(id=>{const el=document.getElementById(id);el.innerHTML=ps.map(p=>`<option ${p===db.activePeriod?'selected':''}>${esc(p)}</option>`).join('')});const pm=profileMap();const phtml=Object.entries(pm).map(([k,p])=>`<option value="${esc(k)}" ${k===db.activeProfile?'selected':''}>${esc(lang==='vi'?(p.nameVI||p.nameEN):(p.nameEN||p.nameVI))}</option>`).join('');document.getElementById('globalProfile').innerHTML=phtml;['historyProvider'].forEach(id=>{const el=document.getElementById(id),old=el.value;el.innerHTML=providerNames().map(n=>`<option ${n===old?'selected':''}>${esc(n)}</option>`).join('')})}
+function renderDash(){
+  const allRows=db.periods[db.activePeriod]||[];
+  const rows=validRows(db.activePeriod);
+  const invalidCount=Math.max(0,allRows.length-rows.length);
+  const res=topsis(rows,activeWeights());
+  const periodCount=periodsSorted().length;
+  const providerCount=rows.length;
+
+  document.getElementById('dashKpis').innerHTML=[
+    [tr('current_period'),db.activePeriod],
+    [tr('valid_providers'),providerCount],
+    [tr('active_priority'),profileLabel(db.activeProfile)],
+    [tr('stored_periods'),periodCount]
+  ].map(([l,v])=>`<div class="card kpi"><div class="lab">${esc(l)}</div><div class="val">${esc(v)}</div></div>`).join('');
+
+  if(res){
+    const a=res.out[0],b=res.out[1];
+    document.getElementById('dashRecommend').innerHTML=
+      `<span class="badge bgood">${tr('recommended')}</span>
+       <h2>${esc(a.name)}</h2>
+       <p>${tr('decision_score')}: <b>${f(a.ci)}</b></p>
+       <p>${tr('backup_label')}: <b>${esc(b.name)}</b></p>
+       <p class="small muted">${esc(db.activePeriod)} · ${esc(profileLabel(db.activeProfile))}</p>`;
+  }else{
+    document.getElementById('dashRecommend').innerHTML=`<div class="warnbox">${tr('need_two')}</div>`;
+  }
+
+  const statusText=invalidCount
+    ? tr('data_status_check').replace('{invalid}',invalidCount)
+    : tr('data_status_ready').replace('{valid}',providerCount).replace('{total}',allRows.length);
+  document.getElementById('dashScale').innerHTML=
+    `<span class="badge ${invalidCount?'bwarn':'bblue'}">${tr('data_status')}</span>
+     <div class="bigline">${esc(db.activePeriod)} · ${providerCount}/${allRows.length} ${tr('provider_count_suffix')}</div>
+     <p>${esc(statusText)}</p>
+     <p class="small muted">${esc(profileLabel(db.activeProfile))}</p>`;
+}
+function profileLabel(k){const p=profileMap()[k];return p?(lang==='vi'?(p.nameVI||p.nameEN):(p.nameEN||p.nameVI)):k}
+function renderData(){
+  const rows=db.periods[db.activePeriod]||[],q=document.getElementById('providerSearch').value.toLowerCase();
+  const show=rows.map((r,i)=>({r,i})).filter(x=>x.r.name.toLowerCase().includes(q));
+  // Drop selections that no longer exist in the current period.
+  selectedRows=new Set([...selectedRows].filter(i=>i>=0&&i<rows.length));
+  document.getElementById('rowCount').textContent=`${show.length} / ${rows.length} ${tr('provider_count_suffix')}`;
+  document.getElementById('selectedCount').textContent=`${selectedRows.size} ${tr('selected_count')}`;
+  document.getElementById('deleteSelected').disabled=selectedRows.size===0;
+  document.getElementById('selectionBar').style.display='none';
+  document.getElementById('undoImport').disabled=!localStorage.getItem(SNAPSHOT_KEY);
+  const allVisibleSelected=show.length>0&&show.every(x=>selectedRows.has(x.i));
+  document.getElementById('dataHead').innerHTML=`<tr><th style="width:42px;text-align:center"><input id="selectAllRows" class="selbox" type="checkbox" ${allVisibleSelected?'checked':''} title="Select all visible rows"></th><th>${tr('provider_col')}</th>`+CRIT.map(c=>`<th>${c.id}<br><span style="font-weight:400;opacity:.7">${esc(c[lang])}</span></th>`).join('')+'<th></th></tr>';
+  document.getElementById('dataBody').innerHTML=show.map(({r,i})=>`<tr><td style="text-align:center"><input class="selbox rowSelect" type="checkbox" data-select="${i}" ${selectedRows.has(i)?'checked':''}></td><td><input class="name" value="${esc(r.name)}" data-i="${i}" data-name="1"></td>${r.v.map((v,j)=>`<td><input value="${Number.isFinite(+v)?esc(v):''}" data-i="${i}" data-j="${j}" class="${isValidVal(v,j)?'':'badcell'}"></td>`).join('')}<td><button class="action quiet" data-del="${i}">×</button></td></tr>`).join('');
+}
+function isValidVal(v,j){return Number.isFinite(+v)&&+v>=CRIT[j].min&&+v<=CRIT[j].max}
+function rebalanceWeights(i,newVal){let w=db.customW.slice(),nv=Math.max(0,Math.min(1,newVal));const other=w.map((x,k)=>k===i?0:x),os=sum(other),remain=1-nv;if(os<=1e-12){for(let k=0;k<5;k++)if(k!==i)w[k]=remain/4}else{for(let k=0;k<5;k++)if(k!==i)w[k]=other[k]/os*remain}w[i]=nv;const correction=1-sum(w);const k=i===4?3:4;w[k]+=correction;db.customW=w;db.activeProfile='custom';saveState();}
+function renderPriority(){document.getElementById('sliders').innerHTML=GROUPS.map((g,i)=>`<div class="sliderrow"><b>${g.code}</b><div class="slab">${esc(g[lang])}<small>${CRIT.filter(c=>c.g===i).map(c=>c[lang]).join(' · ')}</small></div><input type="range" min="0" max="100" step="0.1" value="${(db.customW[i]*100).toFixed(1)}" data-slider="${i}"><div class="pct">${(db.customW[i]*100).toFixed(1)}%</div></div>`).join('');document.getElementById('totalWeight').textContent=(sum(db.customW)*100).toFixed(1)+'%';const pm=profileMap();document.getElementById('profileCards').innerHTML=Object.entries(pm).filter(([k])=>k!=='custom').map(([k,p])=>{const isCustomer=Object.prototype.hasOwnProperty.call(db.profiles,k);const main=`<button class="action" data-profile="${esc(k)}" style="display:block;width:100%;text-align:left;${db.activeProfile===k?'background:var(--blue2)':''}"><b>${esc(lang==='vi'?(p.nameVI||p.nameEN):(p.nameEN||p.nameVI))}</b><br><span class="small muted">${p.w.map(x=>(x*100).toFixed(1)+'%').join(' / ')}</span></button>`;return isCustomer?`<div class="profileRow">${main}<button class="profileDelete" data-delete-profile="${esc(k)}" title="${esc(tr('delete_profile'))}" aria-label="${esc(tr('delete_profile'))}">×</button></div>`:`<div class="profileRow" style="grid-template-columns:1fr">${main}</div>`}).join('');document.getElementById('localWeightCards').innerHTML=GROUPS.map((g,i)=>{const cs=CRIT.filter(c=>c.g===i);return `<div class="card"><span class="badge bblue">${g.code}</span><h3>${esc(g[lang])}</h3><p class="mono">${cs.map(c=>c.id+' '+c.local.toFixed(4)).join('<br>')}</p></div>`}).join('')}
+function renderRanking(){const rows=validRows(db.activePeriod),res=topsis(rows,activeWeights()),warn=document.getElementById('rankWarnings');document.getElementById('rankContext').textContent=`${db.activePeriod} · ${profileLabel(db.activeProfile)} · ${rows.length} ${tr('provider_count_suffix')}`;if(!res){warn.innerHTML=`<div class="warnbox">${tr('need_two')}</div>`;document.getElementById('rankingList').innerHTML='';return}warn.innerHTML='';const max=res.out[0].ci||1;document.getElementById('rankingList').innerHTML=res.out.map((o,k)=>`<div class="rankrow ${k===0?'top':''} ${k===res.out.length-1?'low':''}"><div class="rankpos">${k+1}</div><div><div class="rankname">${esc(o.name)}</div><div class="small muted">${groupPositionLabel(rankPercentile(k+1,res.out.length),k+1,res.out.length)}</div></div><div class="bar"><i style="width:${Math.max(1,o.ci/max*100)}%"></i></div><div class="score" title="TOPSIS closeness coefficient">${f(o.ci)}</div></div>`).join('');document.getElementById('recommendCard').innerHTML=`<span class="badge bgood">${tr('recommended')}</span><h2>${esc(res.out[0].name)}</h2><p>${tr('backup_label')}: <b>${esc(res.out[1].name)}</b></p><p class="small muted">${tr('decision_support_note')}</p>`;const scen=['expert','equal','cost','service'].map(k=>{const rr=topsis(rows,BASE_PROFILES[k].w);return `<tr><td>${esc(profileLabel(k))}</td><td>${rr?esc(rr.out[0].name):'—'}</td><td>${rr?f(rr.out[0].ci):'—'}</td></tr>`}).join('');document.getElementById('scenarioCard').innerHTML=`<h3>${tr('scenario_comparison')}</h3><table style="min-width:0"><thead><tr><th>${tr('scenario')}</th><th>${tr('rank1')}</th><th>${tr('decision_score')} (C*)</th></tr></thead><tbody>${scen}</tbody></table>`}
+function rankPercentile(rank,n){return n<=1?100:100*(n-rank)/(n-1)}
+function groupPositionLabel(percentile,rank,n){
+  if(n<=1)return tr('position_best').replace('{n}',n);
+  if(rank===1)return tr('position_best').replace('{n}',n);
+  return tr('position_outanks').replace('{rank}',rank).replace('{n}',n).replace('{out}',n-rank).replace('{others}',n-1);
+}
+function managementGuidanceText(h){
+  if(h.length<2)return tr('guidance_need_more');
+  const m=trendMetrics(h);
+  if(m.key==='improving')return tr('guidance_improving');
+  if(m.key==='declining')return tr('guidance_declining');
+  if(m.key==='mixed')return tr('guidance_mixed');
+  return tr('guidance_stable');
+}
+
+function renderHistoryWindowControls(){
+  const ps=periodsSorted();
+  const win=document.getElementById('historyWindow');
+  const from=document.getElementById('historyFrom');
+  const to=document.getElementById('historyTo');
+  const custom=document.getElementById('customHistoryRange');
+  if(!win||!from||!to||!custom)return;
+  const opts=[
+    ['4',tr('last_4_periods')],
+    ['5',tr('last_5_periods')],
+    ['8',tr('last_8_periods')],
+    ['all',tr('all_periods')],
+    ['custom',tr('custom_range')]
+  ];
+  win.innerHTML=opts.map(([v,l])=>`<option value="${v}" ${db.historyWindow===v?'selected':''}>${esc(l)}</option>`).join('');
+  if(ps.length){
+    if(!ps.includes(db.historyFrom))db.historyFrom=ps[0];
+    if(!ps.includes(db.historyTo))db.historyTo=ps.at(-1);
+    from.innerHTML=ps.map(p=>`<option value="${esc(p)}" ${p===db.historyFrom?'selected':''}>${esc(p)}</option>`).join('');
+    to.innerHTML=ps.map(p=>`<option value="${esc(p)}" ${p===db.historyTo?'selected':''}>${esc(p)}</option>`).join('');
+  }else{
+    from.innerHTML='';to.innerHTML='';
+  }
+  custom.style.display=db.historyWindow==='custom'?'flex':'none';
+}
+function normalizeHistoryRange(){
+  const ps=periodsSorted();
+  if(!ps.length)return;
+  let i=ps.indexOf(db.historyFrom),j=ps.indexOf(db.historyTo);
+  if(i<0)i=0;if(j<0)j=ps.length-1;
+  if(i>j){const tmp=db.historyFrom;db.historyFrom=db.historyTo;db.historyTo=tmp;}
+}
+function applyHistoryWindow(h){
+  if(!h.length)return h;
+  const mode=db.historyWindow||'4';
+  if(mode==='all')return h.slice();
+  if(mode==='custom'){
+    normalizeHistoryRange();
+    const ps=periodsSorted();
+    const i=Math.max(0,ps.indexOf(db.historyFrom)),j=Math.max(i,ps.indexOf(db.historyTo));
+    const allowed=new Set(ps.slice(i,j+1));
+    return h.filter(x=>allowed.has(x.period));
+  }
+  const n=Math.max(1,parseInt(mode,10)||4);
+  return h.slice(-n);
+}
+function providerHistory(name){const out=[];for(const p of periodsSorted()){const rows=validRows(p),res=topsis(rows,activeWeights());if(!res)continue;const item=res.out.find(x=>x.name===name);if(item){out.push({period:p,rank:item.rank,n:res.out.length,percentile:rankPercentile(item.rank,res.out.length),score:item.ci,row:item.row})}}return out}
+
+function setHistoryTab(tab){
+  db.historyTab=tab==='top'?'top':'individual';
+  document.querySelectorAll('.historytab').forEach(b=>b.classList.toggle('active',b.dataset.historyTab===db.historyTab));
+  const individual=document.getElementById('historyIndividualPanel');
+  const top=document.getElementById('historyTopPanel');
+  if(individual)individual.classList.toggle('active',db.historyTab==='individual');
+  if(top)top.classList.toggle('active',db.historyTab==='top');
+  saveState();
+  if(db.historyTab==='top')renderTopProvidersHistory();
+  else renderHistory();
+}
+
+function renderTopHistoryControls(){
+  const ps=periodsSorted();
+  const pSel=document.getElementById('topHistoryPeriod');
+  const nSel=document.getElementById('topHistoryN');
+  if(!pSel||!nSel)return;
+
+  if(!db.topHistoryPeriod || !ps.includes(db.topHistoryPeriod)){
+    db.topHistoryPeriod=ps.includes(db.activePeriod)?db.activePeriod:(ps.at(-1)||'');
+  }
+  pSel.innerHTML=ps.map(p=>`<option value="${esc(p)}" ${p===db.topHistoryPeriod?'selected':''}>${esc(p)}</option>`).join('');
+  nSel.value=String(db.topHistoryN||'10');
+  const prof=document.getElementById('topHistoryProfile');
+  if(prof)prof.textContent=profileLabel(db.activeProfile);
+}
+
+function renderTopProvidersHistory(){
+  renderTopHistoryControls();
+  const p=db.topHistoryPeriod;
+  const nWanted=Math.max(1,parseInt(db.topHistoryN||'10',10)||10);
+  const rows=validRows(p);
+  const res=topsis(rows,activeWeights());
+  const kpi=document.getElementById('topHistoryKpis');
+  const table=document.getElementById('topHistoryTable');
+  const movement=document.getElementById('topMovementTable');
+  if(!kpi||!table||!movement)return;
+
+  if(!res || !res.out.length){
+    kpi.innerHTML=`<div class="warnbox">${tr('need_two')}</div>`;
+    table.innerHTML='';
+    movement.innerHTML='';
+    return;
+  }
+
+  const top=res.out.slice(0,Math.min(nWanted,res.out.length));
+  const leader=top[0];
+  const cutoff=top.at(-1);
+
+  kpi.innerHTML=[
+    [tr('leader_provider'),leader.name],
+    [tr('leader_score'),f(leader.ci)],
+    [tr('top_provider_count'),`${top.length} / ${res.out.length}`],
+    [tr('top_cutoff_score'),f(cutoff.ci)]
+  ].map(([l,v])=>`<div class="card kpi"><div class="lab">${esc(l)}</div><div class="val">${esc(v)}</div></div>`).join('');
+
+  table.innerHTML=
+    `<thead><tr>
+      <th>${tr('rank_col')}</th>
+      <th>${tr('provider')}</th>
+      <th>${tr('decision_score')}</th>
+      <th>${tr('position_group')}</th>
+    </tr></thead>
+    <tbody>`+
+    top.map(x=>`<tr>
+      <td><span class="rankpill">#${x.rank}</span></td>
+      <td><b>${esc(x.name)}</b></td>
+      <td>${f(x.ci)}</td>
+      <td>${esc(groupPositionLabel(rankPercentile(x.rank,res.out.length),x.rank,res.out.length))}</td>
+    </tr>`).join('')+
+    `</tbody>`;
+
+  const ps=periodsSorted();
+  const rankMaps={};
+  for(const per of ps){
+    const rr=topsis(validRows(per),activeWeights());
+    const map=new Map();
+    if(rr)rr.out.forEach(x=>map.set(x.name,{rank:x.rank,n:rr.out.length,score:x.ci}));
+    rankMaps[per]=map;
+  }
+
+  movement.innerHTML=
+    `<thead><tr><th>${tr('provider')}</th>${ps.map(per=>`<th>${esc(per)}</th>`).join('')}</tr></thead>
+     <tbody>`+
+    top.map(x=>`<tr>
+      <td><b>${esc(x.name)}</b></td>
+      ${ps.map(per=>{
+        const z=rankMaps[per].get(x.name);
+        return `<td>${z?`#${z.rank}/${z.n}<div class="small muted">${f(z.score)}</div>`:tr('not_available_short')}</td>`;
+      }).join('')}
+    </tr>`).join('')+
+    `</tbody>`;
+}
+
+function renderHistory(){
+  document.querySelectorAll('.historytab').forEach(b=>b.classList.toggle('active',b.dataset.historyTab===db.historyTab));
+  const individual=document.getElementById('historyIndividualPanel');
+  const topPanel=document.getElementById('historyTopPanel');
+  if(individual)individual.classList.toggle('active',db.historyTab!=='top');
+  if(topPanel)topPanel.classList.toggle('active',db.historyTab==='top');
+  renderTopHistoryControls();
+  if(db.historyTab==='top')renderTopProvidersHistory();
+
+  const sel=document.getElementById('historyProvider');
+  if(!sel.value&&sel.options.length)sel.value=sel.options[0].value;
+  const hAll=providerHistory(sel.value), h=applyHistoryWindow(hAll), kpis=document.getElementById('historyKpis');
+  if(!h.length){
+    kpis.innerHTML=`<div class="warnbox">${tr('no_history')}</div>`;
+    document.getElementById('trendSummary').innerHTML='';
+    document.getElementById('trendNarrative').innerHTML='';document.getElementById('managementGuidance').innerHTML=`<span class="badge bblue">${tr('management_guidance')}</span><p style="margin:8px 0 0">${esc(tr('guidance_need_more'))}</p>`;
+    drawRankHistoryChart([]);drawScoreHistoryChart([]);
+  }else{
+    const cur=h.at(-1), label=trendLabel(h);
+    kpis.innerHTML=[
+      [tr('current_rank'),`#${cur.rank} / ${cur.n}`],
+      [tr('current_percentile'),`${groupPositionLabel(cur.percentile,cur.rank,cur.n)}`],
+      [tr('current_topsis'),f(cur.score)],
+      [tr('trend'),label]
+    ].map(([l,v])=>`<div class="card kpi"><div class="lab">${l}</div><div class="val">${v}</div></div>`).join('');
+    drawRankHistoryChart(h);drawScoreHistoryChart(h);renderTrendSummary(h);document.getElementById('managementGuidance').innerHTML=`<span class="badge bblue">${tr('management_guidance')}</span><p style="margin:8px 0 0">${esc(managementGuidanceText(h))}</p>`;
+  }
+  const head=`<thead><tr><th>${tr('period_col')}</th><th>${tr('rank_col')}</th><th>${tr('providers_col')}</th><th>${tr('rank_percentile_col')}</th><th>${tr('decision_score')} (C*)</th><th>${tr('ontime_col')}</th><th>${tr('safety_col')}</th><th>${tr('legal_col')}</th><th>${tr('insurance_col')}</th></tr></thead>`;
+  const body='<tbody>'+h.map(x=>`<tr><td>${esc(x.period)}</td><td>${x.rank}</td><td>${x.n}</td><td>${esc(groupPositionLabel(x.percentile,x.rank,x.n))}</td><td>${f(x.score)}</td><td>${f(+x.row.v[0],1)}</td><td>${f(+x.row.v[1],1)}</td><td>${f(+x.row.v[6],1)}</td><td>${f(+x.row.v[7],1)}</td></tr>`).join('')+'</tbody>';
+  document.getElementById('historyTable').innerHTML=head+body;
+}
+function trendMetrics(h){
+  if(h.length<2)return {label:tr('insufficient_history'),kind:'warn',pct:0,score:0,rank:0};
+  const first=h[0],last=h.at(-1),pct=last.percentile-first.percentile,score=last.score-first.score,rank=first.rank-last.rank;
+  let key='stable',kind='warn';
+  const pctDir=pct>5?1:pct<-5?-1:0, scoreDir=score>.015?1:score<-.015?-1:0;
+  if((pctDir===1&&scoreDir>=0)||(scoreDir===1&&pctDir>=0)){key='improving';kind='good'}
+  else if((pctDir===-1&&scoreDir<=0)||(scoreDir===-1&&pctDir<=0)){key='declining';kind='bad'}
+  else if(pctDir!==0&&scoreDir!==0&&pctDir!==scoreDir){key='mixed';kind='warn'}
+  return {label:tr(key),key,kind,pct,score,rank,first,last};
+}
+function trendLabel(h){return trendMetrics(h).label}
+function deltaClass(v,benefit=true,eps=1e-9){if(Math.abs(v)<=eps)return 'delta-flat';const good=benefit?v>0:v<0;return good?'delta-up':'delta-down'}
+function arrow(v,eps=1e-9){return Math.abs(v)<=eps?'→':v>0?'↑':'↓'}
+function renderTrendSummary(h){
+  const box=document.getElementById('trendSummary'),note=document.getElementById('trendNarrative');
+  if(h.length<2){box.innerHTML=`<div class="card trendcard"><div class="small muted">${tr('periods_available')}</div><div class="big">${h.length}</div><div class="mini">${tr('trend_need_more')}</div></div>`;note.className='card trendNarrative warn';note.innerHTML=`<b>${tr('trend_assessment')}:</b> ${tr('trend_need_more')}`;return}
+  const m=trendMetrics(h),a=m.first,b=m.last;
+  const rankSeq=h.map(x=>`#${x.rank}`).join(' → ');
+  const pctText=`${groupPositionLabel(a.percentile,a.rank,a.n)} → ${groupPositionLabel(b.percentile,b.rank,b.n)}`;
+  const scoreText=`${f(a.score)} → ${f(b.score)}`;
+  const kpiDefs=[
+    ['C11',0,tr('ontime_col')],['C12',1,tr('safety_col')],['C41',6,tr('legal_col')],['C42',7,tr('insurance_col')]
+  ];
+  const kpiHtml=kpiDefs.map(([id,j,label])=>{const d=(+b.row.v[j])-(+a.row.v[j]);return `<div><b>${id}</b> ${(+a.row.v[j]).toFixed(1)} → ${(+b.row.v[j]).toFixed(1)} <span class="${deltaClass(d,true,.05)}">${arrow(d,.05)} ${Math.abs(d).toFixed(1)}</span></div>`}).join('');
+  box.innerHTML=`
+    <div class="card trendcard"><div class="small muted">${tr('rank_movement')}</div><div class="big">${rankSeq}</div><div class="mini">${tr('periods_available')}: ${h.length}</div></div>
+    <div class="card trendcard"><div class="small muted">${tr('percentile_change')}</div><div class="big">${pctText}</div><div class="mini ${deltaClass(m.pct,true,.1)}">${m.pct>0?tr('trend_improved'):m.pct<0?tr('trend_declined'):tr('trend_unchanged')}</div></div>
+    <div class="card trendcard"><div class="small muted">${tr('topsis_change')}</div><div class="big">${scoreText}</div><div class="mini ${deltaClass(m.score,true,.001)}">${arrow(m.score,.001)} ${Math.abs(m.score).toFixed(4)}</div></div>
+    <div class="card trendcard"><div class="small muted">${tr('critical_kpi_change')}</div><div class="mini" style="margin-top:7px;line-height:1.7">${kpiHtml}</div></div>`;
+  let text=m.key==='declining'?tr('trend_declining_text'):m.key==='improving'?tr('trend_improving_text'):m.key==='mixed'?tr('trend_mixed_text'):tr('trend_stable_text');
+  note.className=`card trendNarrative ${m.kind}`;
+  note.innerHTML=`<span class="badge ${m.kind==='good'?'bgood':m.kind==='bad'?'bbad':'bwarn'}">${esc(m.label)}</span><h3 style="margin-top:8px">${tr('trend_assessment')}</h3><p style="margin-bottom:0">${esc(text)}</p>`;
+}
+function drawRankHistoryChart(h){
+  const svg=document.getElementById('rankHistoryChart');if(!h.length){svg.innerHTML=`<text x="50" y="140" fill="#697386">${tr('no_history_plot')}</text>`;return}
+  const W=900,H=280,pad=58,x=i=>h.length===1?W/2:pad+i*(W-2*pad)/(h.length-1),y=v=>H-pad-v*(H-2*pad)/100;
+  let grid='';const axis=[[100,tr('relative_best')],[75,tr('relative_high')],[50,tr('relative_mid')],[25,tr('relative_low')],[0,tr('relative_bottom')]];for(const [q,lab] of axis){const yy=y(q);grid+=`<line x1="${pad}" y1="${yy}" x2="${W-pad}" y2="${yy}" stroke="#e5e2db"/><text x="8" y="${yy+4}" font-size="10" fill="#697386">${esc(lab)}</text>`}
+  const line=h.map((d,i)=>`${x(i)},${y(d.percentile)}`).join(' ');
+  const pts=h.map((d,i)=>`<circle cx="${x(i)}" cy="${y(d.percentile)}" r="6" fill="#2f5f9e"/><text x="${x(i)}" y="${Math.max(18,y(d.percentile)-12)}" text-anchor="middle" font-size="11" font-weight="700" fill="#17243d">#${d.rank}/${d.n}</text><text x="${x(i)}" y="${H-17}" text-anchor="middle" font-size="11" fill="#17243d">${esc(d.period)}</text>`).join('');
+  svg.innerHTML=grid+`<polyline fill="none" stroke="#2f5f9e" stroke-width="3" points="${line}"/>`+pts;
+}
+function drawScoreHistoryChart(h){
+  const svg=document.getElementById('scoreHistoryChart');if(!h.length){svg.innerHTML=`<text x="50" y="140" fill="#697386">${tr('no_history_plot')}</text>`;return}
+  const W=900,H=280,pad=58,x=i=>h.length===1?W/2:pad+i*(W-2*pad)/(h.length-1),y=v=>H-pad-v*(H-2*pad);
+  let grid='';for(let q=0;q<=1.0001;q+=.25){const yy=y(q);grid+=`<line x1="${pad}" y1="${yy}" x2="${W-pad}" y2="${yy}" stroke="#e5e2db"/><text x="8" y="${yy+4}" font-size="11" fill="#697386">${q.toFixed(2)}</text>`}
+  const line=h.map((d,i)=>`${x(i)},${y(d.score)}`).join(' ');
+  const pts=h.map((d,i)=>`<circle cx="${x(i)}" cy="${y(d.score)}" r="6" fill="#c65d20"/><text x="${x(i)}" y="${Math.max(18,y(d.score)-12)}" text-anchor="middle" font-size="11" font-weight="700" fill="#17243d">${d.score.toFixed(3)}</text><text x="${x(i)}" y="${H-17}" text-anchor="middle" font-size="11" fill="#17243d">${esc(d.period)}</text>`).join('');
+  svg.innerHTML=grid+`<polyline fill="none" stroke="#c65d20" stroke-width="3" points="${line}"/>`+pts;
+}
+function renderAll(){renderSelectors();renderHistoryWindowControls();renderDash();renderData();renderPriority();renderRanking();renderHistory();applyLang();renderHistoryWindowControls()}
+function applyLang(){document.documentElement.lang=lang;document.title=lang==='vi'?'Hệ thống Hỗ trợ Ra quyết định Nhà cung cấp WPL V3.9':'WPL Transportation Provider Decision-Support System V3.9';document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;const val=tr(k);if(k==='input_lines'||k==='output_lines')el.innerHTML=val.replace(/\n/g,'<br>');else el.textContent=val});document.getElementById('btnEN').classList.toggle('on',lang==='en');document.getElementById('btnVI').classList.toggle('on',lang==='vi');document.getElementById('pageTitle').textContent=document.querySelector('.navbtn.active span:last-child').textContent;const v=document.querySelector('.navbtn.active').dataset.view;document.getElementById('pageSub').textContent=tr('page_sub_'+v)}
+function setView(v){document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.view===v));document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id==='view-'+v));document.getElementById('pageTitle').textContent=document.querySelector('.navbtn.active span:last-child').textContent;document.getElementById('pageSub').textContent=tr('page_sub_'+v);if(v==='history')renderHistory()}
+function addProvider(){db.periods[db.activePeriod].push({name:tr('new_provider'),v:Array(10).fill(NaN)});saveState();renderAll()}
+function addPeriodFromUI(){
+  const input=document.getElementById('newPeriodInput');
+  const p=(input?.value||'').trim();
+  if(!p)return alert(tr('period_required'));
+  const existed=Object.prototype.hasOwnProperty.call(db.periods,p);
+  if(!existed)db.periods[p]=[];
+  db.activePeriod=p;
+  selectedRows.clear();
+  if(input)input.value='';
+  saveState();
+  renderAll();
+  alert(tr(existed?'period_exists':'period_added'));
+}
+function parseCSV(text,fileName){
+  const lines=text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(x=>x.trim());
+  const data=lines.filter(l=>!l.startsWith('#'));
+  if(data.length<2)return {count:0,periods:[],rows:[]};
+
+  const split=line=>{
+    let a=[],cur='',q=false;
+    for(let i=0;i<line.length;i++){
+      let c=line[i];
+      if(q){
+        if(c==='"'){
+          if(line[i+1]==='"'){cur+='"';i++}
+          else q=false
+        }else cur+=c
+      }else if(c==='"')q=true;
+      else if(c===','){a.push(cur);cur=''}
+      else cur+=c
+    }
+    a.push(cur);
+    return a
+  };
+
+  const head=split(data[0]).map(x=>x.trim().toLowerCase());
+  const ip=head.indexOf('period'),inm=head.indexOf('provider');
+  const cidx=CRIT.map(c=>head.indexOf(c.id.toLowerCase()));
+  if(inm<0||cidx.some(x=>x<0))throw new Error(tr('required_headers'));
+
+  const rows=[];
+  const importedPeriods=new Set();
+
+  for(const ln of data.slice(1)){
+    const a=split(ln),name=(a[inm]||'').trim();
+    if(!name)continue;
+
+    let p=ip>=0?(a[ip]||'').trim():'';
+    if(!p){
+      const mm=fileName.match(/(20\d{2})/);
+      p=mm?mm[1]:db.activePeriod
+    }
+
+    const v=cidx.map(ix=>parseFloat(String(a[ix]).replace(',','.')));
+    rows.push({period:p,name,v});
+    importedPeriods.add(p);
+  }
+
+  return {count:rows.length,periods:[...importedPeriods],rows};
+}
+
+function importFiles(filesLike){
+  const files=[...filesLike];
+  const fileCount=files.length;
+  if(!fileCount)return;
+
+  const beforeImport=JSON.parse(JSON.stringify(db));
+  const mode=(document.getElementById('importMode')?.value||'replace');
+
+  const pending=files.map(f=>new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>{
+      try{resolve(parseCSV(String(r.result),f.name))}
+      catch(e){reject(new Error(f.name+': '+e.message))}
+    };
+    r.onerror=()=>reject(new Error(f.name));
+    r.readAsText(f,'utf-8');
+  }));
+
+  Promise.all(pending).then(results=>{
+    const allRows=results.flatMap(x=>x.rows||[]);
+    const periods=[...new Set(allRows.map(x=>x.period))].sort((a,b)=>{
+      const na=Number(a),nb=Number(b);
+      return Number.isFinite(na)&&Number.isFinite(nb)?na-nb:String(a).localeCompare(String(b))
+    });
+
+    if(mode==='replace'){
+      periods.forEach(p=>{db.periods[p]=[]});
+    }
+
+    for(const item of allRows){
+      const p=item.period,name=item.name,v=item.v;
+      if(!db.periods[p])db.periods[p]=[];
+      const existing=db.periods[p].find(r=>r.name.toLowerCase()===name.toLowerCase());
+      if(existing)existing.v=v;
+      else db.periods[p].push({name,v});
+    }
+
+    if(periods.length)db.activePeriod=periods[periods.length-1];
+
+    localStorage.setItem(SNAPSHOT_KEY,JSON.stringify(beforeImport));
+    selectedRows.clear();
+    saveState();
+    renderAll();
+
+    const modeText=mode==='replace'?tr('import_done_replace'):tr('import_done_merge');
+    const total=allRows.length;
+    const msg=lang==='vi'
+      ? `${modeText}: ${total} dòng từ ${fileCount} file, thuộc ${periods.length} kỳ: ${periods.join(', ')}.${periods.length?' Đang hiển thị kỳ '+db.activePeriod+'.':''}`
+      : `${modeText}: ${total} rows from ${fileCount} file(s), across ${periods.length} period(s): ${periods.join(', ')}.${periods.length?' Now showing '+db.activePeriod+'.':''}`;
+    alert(msg);
+    renderAll();
+  }).catch(e=>{
+    db=beforeImport;
+    saveState();
+    renderAll();
+    alert(tr('import_failed')+e.message)
+  });
+}
+function csvq(s){s=String(s);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}function download(name,text,type='text/plain'){const b=new Blob([text],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+const SAMPLE_CSV_B64='77u/IyBXUEwgdGhlc2lzIHByb3RvdHlwZSBzYW1wbGUgZGF0YXNldCBmb3IgaW50ZXJmYWNlIHRlc3Rpbmcgb25seS4KIyAyMDI1IHZhbHVlcyBmb3IgdGhlIGZpdmUgb3JpZ2luYWwgdGhlc2lzIHByb3ZpZGVycyBhcmUgdGhlIGJhc2VsaW5lIGRhdGFzZXQ7IDIwMjYtMjAyOCB2YWx1ZXMgYW5kIGFkZGl0aW9uYWwgc3VwcGxpZXIgbmFtZXMgYXJlIGlsbHVzdHJhdGl2ZS9zeW50aGV0aWMuClBlcmlvZCxQcm92aWRlcixDMTEsQzEyLEMyMSxDMjIsQzMxLEMzMixDNDEsQzQyLEM1MSxDNTINCjIwMjUsS25pZ2h0IExvZ2lzdGljcyw5MS45LDk5LjEsMTguMiw3LjAsNjAuNiw2Ny4zLDc4LjQsNzQuMiw0LjEsNzQuNA0KMjAyNSxUcmFuc2ltZXgsOTMuOSw5OS42LDE5LjgsMy45LDg5LjIsOTQuNyw5Ny43LDk0LjYsMi40LDg0LjYNCjIwMjUsQmVlIExvZ2lzdGljcyw5NS44LDk5LjQsMTkuMSwzLjAsOTEuMSw5MC40LDkyLjcsODguNCwxLjksOTYuMQ0KMjAyNSxJVEwgTG9naXN0aWNzLDk0LjksOTkuNSwxOS40LDMuNiw5Ni43LDk3LjAsOTcuOSw5My42LDIuMiw5MC42DQoyMDI1LEdlbWFkZXB0IExvZ2lzdGljcyw5My43LDk5LjcsMjAuMyw0LjMsOTMuMSw5MS44LDk4LjEsOTcuNiwyLjgsODIuNA0KMjAyNixLbmlnaHQgTG9naXN0aWNzLDkwLjgsOTguOCwxOC40LDcuNSw2Mi4wLDY4LjAsODAuMCw3NS4wLDQuMCw3Ni4wDQoyMDI2LFRyYW5zaW1leCw5NC4yLDk5LjUsMTkuNSwzLjgsOTAuMCw5NS4wLDk4LjAsOTUuMCwyLjMsODUuMA0KMjAyNixCZWUgTG9naXN0aWNzLDk2LjAsOTkuNSwxOC45LDIuOCw5Mi4wLDkxLjAsOTMuMCw4OS4wLDEuOCw5Ni41DQoyMDI2LElUTCBMb2dpc3RpY3MsOTUuMiw5OS42LDE5LjIsMy4zLDk3LjIsOTcuNSw5OC4yLDk0LjUsMi4wLDkxLjUNCjIwMjYsR2VtYWRlcHQgTG9naXN0aWNzLDk0LjAsOTkuOCwyMC4wLDQuMCw5NC4wLDkyLjAsOTguNSw5OC4wLDIuNiw4My41DQoyMDI2LFBhY2lmaWMgTGluayBUcmFuc3BvcnQsOTIuNSw5OC45LDE4LjcsMy41LDg4LjAsOTAuMCw5Ni4wLDkyLjAsMi4xLDkwLjANCjIwMjYsU2FpZ29uIEZyZWlnaHQgU29sdXRpb25zLDkxLjUsOTguNywxNy45LDUuMCw4NS4wLDg2LjAsOTQuMCw5MC4wLDIuOCw4OC4wDQoyMDI3LEtuaWdodCBMb2dpc3RpY3MsODguNSw5OC4yLDE5LjAsOC4yLDYwLjAsNjUuMCw3Ny4wLDcyLjAsNC41LDcyLjANCjIwMjcsVHJhbnNpbWV4LDk0LjUsOTkuNCwxOS4zLDMuNyw5MC41LDk1LjUsOTguMiw5NS40LDIuMiw4Ni4wDQoyMDI3LEJlZSBMb2dpc3RpY3MsOTYuNCw5OS42LDE4LjcsMi42LDkzLjAsOTIuMCw5NC4wLDkwLjAsMS43LDk3LjANCjIwMjcsSVRMIExvZ2lzdGljcyw5NS42LDk5LjcsMTkuMCwzLjEsOTcuNSw5OC4wLDk4LjUsOTUuMCwxLjksOTIuMA0KMjAyNyxHZW1hZGVwdCBMb2dpc3RpY3MsOTQuMyw5OS44LDIwLjEsMy45LDk0LjUsOTIuNSw5OC44LDk4LjIsMi41LDg0LjANCjIwMjcsUGFjaWZpYyBMaW5rIFRyYW5zcG9ydCw5My41LDk5LjEsMTguNCwzLjIsOTAuMCw5Mi4wLDk2LjgsOTMuMCwxLjksOTIuMA0KMjAyNyxTYWlnb24gRnJlaWdodCBTb2x1dGlvbnMsOTIuMCw5OC44LDE4LjEsNC43LDg2LjAsODcuMCw5NC41LDkxLjAsMi42LDg5LjANCjIwMjcsTWVrb25nIFJvdXRlIExvZ2lzdGljcyw5MC41LDk4LjUsMTguNiw0LjIsODIuMCw4NC4wLDkzLjAsODkuMCwyLjksODYuMA0KMjAyOCxLbmlnaHQgTG9naXN0aWNzLDg0LjAsOTYuOCwyMC4yLDkuMCw1NS4wLDYwLjAsNzIuMCw2OC4wLDUuMiw2Ni4wDQoyMDI4LFRyYW5zaW1leCw5NC42LDk5LjUsMTkuNCwzLjUsOTEuMCw5NS44LDk4LjQsOTUuOCwyLjEsODYuNQ0KMjAyOCxCZWUgTG9naXN0aWNzLDk2LjgsOTkuNywxOC41LDIuNCw5NC4wLDkzLjUsOTUuMCw5MS41LDEuNiw5Ny41DQoyMDI4LElUTCBMb2dpc3RpY3MsOTUuOSw5OS44LDE4LjksMi45LDk4LjAsOTguNCw5OC43LDk1LjYsMS44LDkzLjANCjIwMjgsR2VtYWRlcHQgTG9naXN0aWNzLDk0LjYsOTkuOSwyMC4wLDMuOCw5NS4wLDkzLjAsOTkuMCw5OC41LDIuNCw4NC41DQoyMDI4LFBhY2lmaWMgTGluayBUcmFuc3BvcnQsOTQuMCw5OS4yLDE4LjIsMy4wLDkxLjUsOTMuMCw5Ny4yLDk0LjAsMS44LDkzLjUNCjIwMjgsU2FpZ29uIEZyZWlnaHQgU29sdXRpb25zLDkxLjgsOTguNiwxOC4zLDQuOSw4NS41LDg2LjUsOTQuMiw5MC41LDIuNyw4Ny41DQoyMDI4LE1la29uZyBSb3V0ZSBMb2dpc3RpY3MsOTIuMCw5OC45LDE4LjMsMy44LDg2LjAsODguMCw5NC41LDkxLjAsMi40LDg5LjUNCg==';
+function downloadSampleCSV(){const raw=atob(SAMPLE_CSV_B64);const bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));const blob=new Blob([bytes],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='WPL_SAMPLE_4_YEARS_PROVIDER_DATA.csv';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);alert(tr('sample_downloaded'));}
+function encodePortableState(obj){
+  const bytes=new TextEncoder().encode(JSON.stringify(obj));
+  let binary='';
+  const chunk=0x8000;
+  for(let i=0;i<bytes.length;i+=chunk){
+    binary+=String.fromCharCode(...bytes.subarray(i,i+chunk));
+  }
+  return btoa(binary);
+}
+function exportPortableApp(){
+  try{
+    saveState();
+    const id='portable_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);
+    const payload=encodePortableState(db);
+    let html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+
+    html=html.replace(
+      /const PORTABLE_INSTANCE_ID='[^']*';/,
+      "const PORTABLE_INSTANCE_ID='"+id+"';"
+    );
+    html=html.replace(
+      /const PORTABLE_STATE_B64='[^']*';/,
+      "const PORTABLE_STATE_B64='"+payload+"';"
+    );
+
+    const d=new Date();
+    const stamp=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+    download('WPL_Decision_Support_System_Portable_'+stamp+'.html',html,'text/html');
+    alert(tr('portable_exported'));
+  }catch(e){
+    alert((lang==='vi'?'Không thể xuất ứng dụng chạy độc lập: ':'Could not export portable app: ')+(e&&e.message?e.message:e));
+  }
+}
+function exportPeriod(){const rows=db.periods[db.activePeriod]||[];const head=['Period','Provider',...CRIT.map(c=>c.id)].join(',');const body=rows.map(r=>[db.activePeriod,csvq(r.name),...r.v].join(',')).join('\n');download(`WPL_provider_${db.activePeriod}.csv`,'\uFEFF'+head+'\n'+body,'text/csv;charset=utf-8')}
+function loadDemoHistory(){if(!confirm(tr('demo_confirm')))return;const clone=(arr,mults)=>arr.map((r,idx)=>({name:r.name,v:r.v.map((x,j)=>Math.max(0,Math.min(j===2||j===8?1e9:100,x+(mults[idx]?.[j]||0))))}));const d26=SEED.map(r=>({name:r.name,v:r.v.slice()})),d27=SEED.map(r=>({name:r.name,v:r.v.slice()}));const itl26=d26.find(r=>r.name==='ITL Logistics'),itl27=d27.find(r=>r.name==='ITL Logistics');[0,1,4,5,6,7,9].forEach(j=>itl26.v[j]-=j===1?0.8:4);itl26.v[3]+=2;itl26.v[8]+=1;[0,1,4,5,6,7,9].forEach(j=>itl27.v[j]-=j===1?2.5:10);itl27.v[3]+=5;itl27.v[8]+=2.2;db.periods['2026']=d26;db.periods['2027']=d27;saveState();renderAll();document.getElementById('historyProvider').value='ITL Logistics';renderHistory();alert(tr('demo_loaded'))}
+function loadThesisBaseline(){
+  if(!confirm(tr('baseline_confirm')))return;
+  db.periods['2025']=SEED.map(x=>({name:x.name,v:x.v.slice()}));
+  db.activePeriod='2025';
+  db.activeProfile='expert';
+  db.customW=BASE_PROFILES.expert.w.slice();
+  selectedRows.clear();
+  saveState();renderAll();
+  alert(tr('baseline_loaded'));
+}
+function deleteSelectedProviders(){
+  if(!selectedRows.size)return;
+  if(!confirm(`${tr('delete_selected_confirm')} (${selectedRows.size})`))return;
+  const rows=db.periods[db.activePeriod]||[];
+  db.periods[db.activePeriod]=rows.filter((_,i)=>!selectedRows.has(i));
+  selectedRows.clear();saveState();renderAll();alert(tr('delete_selected_done'));
+}
+function undoLastImport(){
+  const raw=localStorage.getItem(SNAPSHOT_KEY);
+  if(!raw)return alert(tr('undo_none'));
+  if(!confirm(tr('undo_confirm')))return;
+  try{db=JSON.parse(raw);localStorage.removeItem(SNAPSHOT_KEY);selectedRows.clear();saveState();renderAll();alert(tr('undo_done'))}catch(e){localStorage.removeItem(SNAPSHOT_KEY);alert(tr('undo_none'))}
+}
+function clearCurrentPeriodData(){
+  const rows=db.periods[db.activePeriod]||[];
+  if(!rows.length)return;
+  if(!confirm(`${tr('clear_period_confirm')} (${db.activePeriod}: ${rows.length} ${tr('provider_count_suffix')})`))return;
+  db.periods[db.activePeriod]=[];selectedRows.clear();saveState();renderAll();alert(tr('clear_period_done'));
+}
+function clearAllProviderData(){
+  if(!confirm(tr('clear_all_provider_data_confirm')))return;
+  db.periods={'2025':[]};
+  db.activePeriod='2025';
+  db.historyFrom='2025';
+  db.historyTo='2025';
+  selectedRows.clear();
+  localStorage.removeItem(SNAPSHOT_KEY);
+  saveState();
+  renderAll();
+  alert(tr('clear_all_provider_data_done'));
+}
+
+function resetSystemToThesisBaseline(){
+  if(!confirm(tr('reset_system_confirm')))return;
+
+  // Remove both the active state and the last-import snapshot first,
+  // then rebuild the application from the immutable thesis seed.
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(SNAPSHOT_KEY);
+
+  db=defaultState();
+  selectedRows.clear();
+
+  saveState();
+  renderAll();
+  alert(tr('reset_system_done'));
+}
+// Events
+document.querySelectorAll('.navbtn').forEach(b=>b.onclick=()=>setView(b.dataset.view));document.querySelectorAll('.goView').forEach(b=>b.onclick=()=>setView(b.dataset.go));btnEN.onclick=()=>{lang='en';applyLang();renderAll()};btnVI.onclick=()=>{lang='vi';applyLang();renderAll()};globalPeriod.onchange=e=>{db.activePeriod=e.target.value;db.topHistoryPeriod=e.target.value;selectedRows.clear();saveState();renderAll()};dataPeriod.onchange=e=>{db.activePeriod=e.target.value;selectedRows.clear();saveState();renderAll()};globalProfile.onchange=e=>{db.activeProfile=e.target.value;if(db.activeProfile!=='custom')db.customW=profileMap()[db.activeProfile].w.slice();saveState();renderAll()};document.getElementById('addProvider').onclick=addProvider;document.getElementById('downloadSample').onclick=downloadSampleCSV;document.getElementById('addPeriodBtn').onclick=addPeriodFromUI;document.getElementById('loadBaseline').onclick=loadThesisBaseline;document.getElementById('deleteSelected').onclick=deleteSelectedProviders;document.getElementById('undoImport').onclick=undoLastImport;document.getElementById('clearCurrentPeriod').onclick=clearCurrentPeriodData;document.getElementById('clearAllProviderDataBtn').onclick=clearAllProviderData;document.getElementById('resetSystemBtn').onclick=resetSystemToThesisBaseline;document.getElementById('importBtn').onclick=()=>document.getElementById('fileInput').click();document.getElementById('fileInput').onchange=e=>{const files=[...e.target.files];e.target.value='';if(files.length)importFiles(files)};exportPeriod.onclick=exportPeriod;exportPortable.onclick=exportPortableApp;providerSearch.oninput=renderData;saveBackup.onclick=()=>download('WPL_DSS_full_backup.json',JSON.stringify(db,null,2),'application/json');restoreBackup.onclick=()=>restoreInput.click();restoreInput.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.periods)throw 0;db=x;selectedRows.clear();localStorage.removeItem(SNAPSHOT_KEY);saveState();renderAll();const pc=periodsSorted().length,rc=Object.values(db.periods).reduce((a,b)=>a+b.length,0);alert(tr('backup_restored')+' '+pc+' '+tr('periods_stored').toLowerCase()+' · '+rc+' '+tr('provider_count_suffix'))}catch(err){alert(tr('invalid_backup'))}};r.readAsText(f);e.target.value=''};
+dataBody.addEventListener('input',e=>{const i=+e.target.dataset.i;if(e.target.dataset.name){db.periods[db.activePeriod][i].name=e.target.value}else if(e.target.dataset.j!==undefined){const j=+e.target.dataset.j,n=parseFloat(String(e.target.value).replace(',','.'));db.periods[db.activePeriod][i].v[j]=n;e.target.classList.toggle('badcell',!isValidVal(n,j))}saveState();renderDash();renderRanking();renderSelectors()});dataBody.addEventListener('click',e=>{if(e.target.dataset.del!==undefined){const idx=+e.target.dataset.del;db.periods[db.activePeriod].splice(idx,1);selectedRows=new Set([...selectedRows].filter(i=>i!==idx).map(i=>i>idx?i-1:i));saveState();renderAll()}});
+dataBody.addEventListener('change',e=>{if(e.target.dataset.select!==undefined){const i=+e.target.dataset.select;if(e.target.checked)selectedRows.add(i);else selectedRows.delete(i);renderData()}});
+dataHead.addEventListener('change',e=>{if(e.target.id==='selectAllRows'){const rows=db.periods[db.activePeriod]||[],q=document.getElementById('providerSearch').value.toLowerCase();rows.forEach((r,i)=>{if(r.name.toLowerCase().includes(q)){if(e.target.checked)selectedRows.add(i);else selectedRows.delete(i)}});renderData()}});
+sliders.addEventListener('input',e=>{if(e.target.dataset.slider!==undefined){rebalanceWeights(+e.target.dataset.slider,+e.target.value/100);renderAll()}});profileCards.addEventListener('click',e=>{const del=e.target.closest('[data-delete-profile]');if(del){const k=del.dataset.deleteProfile;if(confirm(tr('confirm_delete_profile'))){delete db.profiles[k];if(db.activeProfile===k){db.activeProfile='expert';db.customW=BASE_PROFILES.expert.w.slice()}saveState();renderAll()}return}const b=e.target.closest('[data-profile]');if(!b)return;db.activeProfile=b.dataset.profile;db.customW=profileMap()[db.activeProfile].w.slice();saveState();renderAll()});saveProfile.onclick=()=>{const n=newProfileName.value.trim();if(!n)return alert(tr('enter_profile_name'));const k='cust_'+Date.now();db.profiles[k]={nameEN:n,nameVI:n,w:db.customW.slice()};db.activeProfile=k;newProfileName.value='';saveState();renderAll()};historyProvider.onchange=renderHistory;
+document.querySelectorAll('.historytab').forEach(b=>b.onclick=()=>setHistoryTab(b.dataset.historyTab));
+document.getElementById('topHistoryPeriod').onchange=e=>{db.topHistoryPeriod=e.target.value;saveState();renderTopProvidersHistory()};
+document.getElementById('topHistoryN').onchange=e=>{db.topHistoryN=e.target.value;saveState();renderTopProvidersHistory()};
+historyWindow.onchange=e=>{db.historyWindow=e.target.value;saveState();renderHistoryWindowControls();renderHistory()};
+historyFrom.onchange=e=>{db.historyFrom=e.target.value;normalizeHistoryRange();saveState();renderHistoryWindowControls();renderHistory()};
+historyTo.onchange=e=>{db.historyTo=e.target.value;normalizeHistoryRange();saveState();renderHistoryWindowControls();renderHistory()};
+document.getElementById('newPeriodInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addPeriodFromUI()}});
+document.getElementById('loadDemo').onclick=loadDemoHistory;
+renderAll();
+</script>
+</body>
+</html>
